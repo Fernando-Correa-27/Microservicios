@@ -1,0 +1,338 @@
+﻿[
+    {
+        "Prueba":  "Listar clientes",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "[{\"apellidos\":\"PÃ©rez GÃ³mez\",\"direccion\":\"Av. Javier Prado 123, Lima\",\"estado\":\"ACTIVO\",\"id\":1,\"nombre\":\"Juan\",\"nroDni\":\"12345678\",\"telefono\":\"987654321\"},{\"apellidos\":\"RamÃ­rez Torres\",\"direccion\":\"Calle Los Olivos 456\",\"estado\":\"ACTIVO\",\"id\":2,\"nombre\":\"MarÃ­a\",\"nroDni\":\"87654321\",\"telefono\":\"912345678\"},{\"apellidos\":\"Test\",\"direccion\":\"Av. X 1\",\"estado\":\"ACTIVO\",\"id\":4,\"nombre\":\"Smoke\",\"nroDni\":\"49947581\",\"telefono\":\"900000000\"}]"
+    },
+    {
+        "Prueba":  "Obtener cliente 1",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "{\"apellidos\":\"PÃ©rez GÃ³mez\",\"direccion\":\"Av. Javier Prado 123, Lima\",\"estado\":\"ACTIVO\",\"id\":1,\"nombre\":\"Juan\",\"nroDni\":\"12345678\",\"telefono\":\"987654321\"}"
+    },
+    {
+        "Prueba":  "Cliente inexistente",
+        "Metodo":  "GET",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Cliente no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:02.3395132\"}"
+    },
+    {
+        "Prueba":  "Cliente id no numerico",
+        "Metodo":  "GET",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Parámetro inválido: id\",\"timestamp\":\"2026-11-01T17:57:02.3726692\"}"
+    },
+    {
+        "Prueba":  "Cliente sin nombre",
+        "Metodo":  "POST",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"nombre\":\"El nombre es obligatorio\"},\"timestamp\":\"2026-11-01T17:57:02.4698195\"}"
+    },
+    {
+        "Prueba":  "Cliente telefono invalido",
+        "Metodo":  "POST",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"telefono\":\"El teléfono debe tener exactamente 9 dígitos\"},\"timestamp\":\"2026-11-01T17:57:02.4779096\"}"
+    },
+    {
+        "Prueba":  "DNI duplicado",
+        "Metodo":  "POST",
+        "Esperado":  409,
+        "Obtenido":  409,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Ya existe un cliente con DNI: 12345678\",\"timestamp\":\"2026-11-01T17:57:02.7634408\"}"
+    },
+    {
+        "Prueba":  "Crear cliente valido",
+        "Metodo":  "POST",
+        "Esperado":  201,
+        "Obtenido":  201,
+        "OK":  "SI",
+        "Detalle":  "{\"apellidos\":\"Test\",\"direccion\":\"Av. X 1\",\"estado\":\"ACTIVO\",\"id\":5,\"nombre\":\"Smoke\",\"nroDni\":\"47508276\",\"telefono\":\"900000000\"}"
+    },
+    {
+        "Prueba":  "Listar categorias",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "[{\"id\":1,\"nombre\":\"Laptops\",\"estado\":\"ACTIVO\"},{\"id\":2,\"nombre\":\"Accesorios\",\"estado\":\"ACTIVO\"},{\"id\":3,\"nombre\":\"Impresoras\",\"estado\":\"ACTIVO\"},{\"id\":6,\"nombre\":\"Smoke 423373409\",\"estado\":\"ACTIVO\"}]"
+    },
+    {
+        "Prueba":  "Categoria id no numerico",
+        "Metodo":  "GET",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Parámetro inválido: id\",\"timestamp\":\"2026-11-01T17:57:03.2499344\"}"
+    },
+    {
+        "Prueba":  "Categoria inexistente",
+        "Metodo":  "GET",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Categoría no encontrada con id: 99999\",\"timestamp\":\"2026-11-01T17:57:03.2791665\"}"
+    },
+    {
+        "Prueba":  "Categoria nombre vacio",
+        "Metodo":  "POST",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"nombre\":\"El nombre es obligatorio\"},\"timestamp\":\"2026-11-01T17:57:03.3594298\"}"
+    },
+    {
+        "Prueba":  "Actualizar categoria inexistente",
+        "Metodo":  "PUT",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Categoría no encontrada con id: 99999\",\"timestamp\":\"2026-11-01T17:57:03.3719531\"}"
+    },
+    {
+        "Prueba":  "Crear categoria valida",
+        "Metodo":  "POST",
+        "Esperado":  201,
+        "Obtenido":  201,
+        "OK":  "SI",
+        "Detalle":  "{\"id\":7,\"nombre\":\"Smoke 1915901188\",\"estado\":\"ACTIVO\"}"
+    },
+    {
+        "Prueba":  "Listar productos",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "[{\"categoriaId\":1,\"id\":1,\"nombre\":\"Laptop Lenovo ThinkPad\",\"precio\":3500.00,\"stock\":15},{\"categoriaId\":2,\"id\":2,\"nombre\":\"Mouse Logitech M185\",\"precio\":89.90,\"stock\":50},{\"categoriaId\":2,\"id\":3,\"nombre\":\"Teclado MecÃ¡nico Redragon\",\"precio\":199.99,\"stock\":25},{\"categoriaId\":1,\"id\":5,\"nombre\":\"Smoke 135572365\",\"precio\":12.50,\"stock\":3},{\"categoriaId\":1,\"id\":6,\"nombre\":\"Recuperado\",\"precio\":10.00,\"stock\":1}]"
+    },
+    {
+        "Prueba":  "Producto inexistente",
+        "Metodo":  "GET",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Producto no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:03.8803561\"}"
+    },
+    {
+        "Prueba":  "Producto precio negativo",
+        "Metodo":  "POST",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"precio\":\"El precio no puede ser negativo\"},\"timestamp\":\"2026-11-01T17:57:04.0020043\"}"
+    },
+    {
+        "Prueba":  "Producto categoria inexistente",
+        "Metodo":  "POST",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Categoría no encontrada con id: 99999\",\"timestamp\":\"2026-11-01T17:57:04.1420876\"}"
+    },
+    {
+        "Prueba":  "Crear producto valido",
+        "Metodo":  "POST",
+        "Esperado":  201,
+        "Obtenido":  201,
+        "OK":  "SI",
+        "Detalle":  "{\"categoriaId\":1,\"id\":7,\"nombre\":\"Smoke 1891151698\",\"precio\":12.50,\"stock\":3}"
+    },
+    {
+        "Prueba":  "Listar pedidos",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "[{\"detalles\":[{\"cantidad\":1,\"idDetalle\":1,\"idProducto\":1,\"precio\":3500.00},{\"cantidad\":2,\"idDetalle\":2,\"idProducto\":2,\"precio\":89.90}],\"fecha\":\"2026-06-10\",\"idCliente\":1,\"idPedido\":1,\"total\":3679.80},{\"detalles\":[{\"cantidad\":1,\"idDetalle\":5,\"idProducto\":1,\"precio\":3500.00},{\"cantidad\":2,\"idDetalle\":6,\"idProducto\":2,\"precio\":89.90}],\"fecha\":\"2026-11-01\",\"idCliente\":1,\"idPedido\":3,\"total\":3679.80}]"
+    },
+    {
+        "Prueba":  "Pedido sin detalles",
+        "Metodo":  "POST",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"detalles\":\"El pedido debe tener al menos un detalle\"},\"timestamp\":\"2026-11-01T17:57:04.8385816\"}"
+    },
+    {
+        "Prueba":  "Pedido cliente inexistente",
+        "Metodo":  "POST",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Cliente no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:04.9651417\"}"
+    },
+    {
+        "Prueba":  "Pedido producto inexistente",
+        "Metodo":  "POST",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Producto no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:04.9940577\"}"
+    },
+    {
+        "Prueba":  "Crear pedido valido",
+        "Metodo":  "POST",
+        "Esperado":  201,
+        "Obtenido":  201,
+        "OK":  "SI",
+        "Detalle":  "{\"detalles\":[{\"cantidad\":1,\"idDetalle\":7,\"idProducto\":1,\"precio\":3500},{\"cantidad\":2,\"idDetalle\":8,\"idProducto\":2,\"precio\":89.90}],\"fecha\":\"2026-11-01\",\"idCliente\":1,\"idPedido\":4,\"total\":3679.80}"
+    },
+    {
+        "Prueba":  "Listar pacientes",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "[{\"apellidos\":\"Quispe HuamÃ¡n\",\"correo\":\"jquispe@example.com\",\"direccion\":\"Av. Arequipa 1234, Lima\",\"dni\":\"45678912\",\"estado\":\"A\",\"fechaNacimiento\":\"1990-05-15\",\"idPaciente\":1,\"nombres\":\"Juan Carlos\",\"sexo\":\"M\",\"telefono\":\"987654321\"},{\"apellidos\":\"Rojas Salazar\",\"correo\":\"mrojas@example.com\",\"direccion\":\"Jr. Los Ãlamos 456, San Isidro\",\"dni\":\"41234567\",\"estado\":\"A\",\"fechaNacimiento\":\"1985-11-03\",\"idPaciente\":2,\"nombres\":\"MarÃ­a Fernanda\",\"sexo\":\"F\",\"telefono\":\"912345678\"}]"
+    },
+    {
+        "Prueba":  "Paciente inexistente",
+        "Metodo":  "GET",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Paciente no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:05.4996451\"}"
+    },
+    {
+        "Prueba":  "Paciente dni invalido",
+        "Metodo":  "POST",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"dni\":\"El DNI debe tener exactamente 8 dígitos\"},\"timestamp\":\"2026-11-01T17:57:05.60307\"}"
+    },
+    {
+        "Prueba":  "Paciente dni duplicado",
+        "Metodo":  "POST",
+        "Esperado":  409,
+        "Obtenido":  409,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Ya existe un paciente con DNI: 45678912\",\"timestamp\":\"2026-11-01T17:57:05.8600386\"}"
+    },
+    {
+        "Prueba":  "Listar especialidades",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "[{\"descripcion\":\"DiagnÃ³stico y tratamiento de enfermedades del corazÃ³n\",\"estado\":\"A\",\"idEspecialidad\":1,\"nombre\":\"CardiologÃ­a\"},{\"descripcion\":\"AtenciÃ³n integral de niÃ±os y adolescentes\",\"estado\":\"A\",\"idEspecialidad\":2,\"nombre\":\"PediatrÃ­a\"}]"
+    },
+    {
+        "Prueba":  "Listar medicos",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "[{\"apellidos\":\"Mendoza RÃ­os\",\"cmp\":\"45678\",\"correo\":\"cmendoza@example.com\",\"estado\":\"A\",\"idEspecialidad\":1,\"idMedico\":1,\"nombres\":\"Carlos Alberto\",\"telefono\":\"999888777\"},{\"apellidos\":\"Torres Vega\",\"cmp\":\"56789\",\"correo\":\"atorres@example.com\",\"estado\":\"A\",\"idEspecialidad\":2,\"idMedico\":2,\"nombres\":\"Ana LucÃ­a\",\"telefono\":\"988777666\"}]"
+    },
+    {
+        "Prueba":  "Medico inexistente",
+        "Metodo":  "GET",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Médico no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:06.2744006\"}"
+    },
+    {
+        "Prueba":  "Medico especialidad inexistente",
+        "Metodo":  "POST",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Especialidad no encontrada con id: 99999\",\"timestamp\":\"2026-11-01T17:57:06.6116178\"}"
+    },
+    {
+        "Prueba":  "Medico cmp duplicado",
+        "Metodo":  "POST",
+        "Esperado":  409,
+        "Obtenido":  409,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Ya existe un médico con CMP: 45678\",\"timestamp\":\"2026-11-01T17:57:06.6249165\"}"
+    },
+    {
+        "Prueba":  "Listar citas",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "[{\"estado\":\"ATENDIDA\",\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idCita\":1,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Dolor torÃ¡cico y control de presiÃ³n arterial\"},{\"estado\":\"CANCELADA\",\"fecha\":\"2026-11-16\",\"hora\":\"10:00:00\",\"idCita\":2,\"idMedico\":2,\"idPaciente\":2,\"motivo\":\"Control pediÃ¡trico y vacunaciÃ³n\"},{\"estado\":\"ATENDIDA\",\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idCita\":3,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Dolor torÃ¡cico y control de presiÃ³n arterial\"},{\"estado\":\"CONFIRMADA\",\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idCita\":4,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Dolor torÃ¡cico y control de presiÃ³n arterial\"},{\"estado\":\"PROGRAMADA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":7,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Smoke\"}]"
+    },
+    {
+        "Prueba":  "Cita paciente inexistente",
+        "Metodo":  "POST",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Paciente no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:07.2365636\"}"
+    },
+    {
+        "Prueba":  "Cita medico inexistente",
+        "Metodo":  "POST",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Médico no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:07.2760428\"}"
+    },
+    {
+        "Prueba":  "Cita sin fecha",
+        "Metodo":  "POST",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"fecha\":\"La fecha es obligatoria\"},\"timestamp\":\"2026-11-01T17:57:07.2886251\"}"
+    },
+    {
+        "Prueba":  "Crear cita valida",
+        "Metodo":  "POST",
+        "Esperado":  201,
+        "Obtenido":  201,
+        "OK":  "SI",
+        "Detalle":  "{\"estado\":\"PROGRAMADA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":8,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Smoke\"}"
+    },
+    {
+        "Prueba":  "Transicion PROGRAMADA-\u003eCONFIRMADA",
+        "Metodo":  "PUT",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "{\"estado\":\"CONFIRMADA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":7,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Smoke\"}"
+    },
+    {
+        "Prueba":  "Transicion CONFIRMADA-\u003eATENDIDA",
+        "Metodo":  "PUT",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "{\"estado\":\"ATENDIDA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":7,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Smoke\"}"
+    },
+    {
+        "Prueba":  "Cita terminal no cambia",
+        "Metodo":  "PUT",
+        "Esperado":  409,
+        "Obtenido":  409,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Transición no permitida: ATENDIDA -\u003e CANCELADA. Estados terminales: ATENDIDA y CANCELADA\",\"timestamp\":\"2026-11-01T17:57:07.5899416\"}"
+    },
+    {
+        "Prueba":  "Obtener atencion de la cita",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "{\"diagnostico\":\"Control\",\"fechaRegistro\":\"2026-11-01T17:57:08\",\"idAtencion\":4,\"observaciones\":\"OK\",\"tratamiento\":\"Reposo\"}"
+    }
+]

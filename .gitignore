@@ -4,6 +4,6 @@ target/
 *.iml
 .vscode/
 *.class
-run/
+run/logs/
 Lab_Microservicios/.obsidian/
 run/logs/
