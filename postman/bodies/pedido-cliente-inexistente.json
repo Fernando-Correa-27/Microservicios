@@ -1,0 +1,11 @@
+{
+  "fecha": "2026-06-10",
+  "idCliente": 999,
+  "detalles": [
+    {
+      "idProducto": 1,
+      "cantidad": 1,
+      "precio": 3500.00
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "nombre": "Producto con categoría inexistente",
+  "precio": 10.00,
+  "stock": 1,
+  "categoriaId": 999
+}

@@ -1,0 +1,56 @@
+package com.tecsup.controller;
+
+import com.tecsup.dto.PedidoDTO;
+import com.tecsup.model.Pedido;
+import com.tecsup.services.PedidoService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/pedidos")
+public class PedidoController {
+
+    private final PedidoService service;
+
+    public PedidoController(PedidoService service) {
+        this.service = service;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Pedido>> listar() {
+        return ResponseEntity.ok(service.listar());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Pedido> buscar(@PathVariable Long id) {
+        return ResponseEntity.ok(service.obtener(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<Pedido> guardar(@Valid @RequestBody PedidoDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(dto));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Pedido> actualizar(@PathVariable Long id, @Valid @RequestBody PedidoDTO dto) {
+        return ResponseEntity.ok(service.actualizar(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> eliminar(@PathVariable Long id) {
+        service.eliminar(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Pedido eliminado correctamente"));
+    }
+}

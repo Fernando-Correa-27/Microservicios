@@ -1,0 +1,17 @@
+{
+  "fecha": "2026-06-10",
+  "idCliente": 2,
+  "total": 579.78,
+  "detalles": [
+    {
+      "idProducto": 2,
+      "cantidad": 2,
+      "precio": 89.90
+    },
+    {
+      "idProducto": 3,
+      "cantidad": 2,
+      "precio": 199.99
+    }
+  ]
+}

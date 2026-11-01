@@ -1,0 +1,8 @@
+{
+  "nombre": "Juan",
+  "apellidos": "Pérez Gómez",
+  "direccion": "Av. Javier Prado 123, Lima",
+  "telefono": "987654321",
+  "nroDni": "12345678",
+  "estado": "ACTIVO"
+}
