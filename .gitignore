@@ -1,0 +1,9 @@
+target/
+*.log
+.idea/
+*.iml
+.vscode/
+*.class
+run/
+Lab_Microservicios/.obsidian/
+run/logs/
