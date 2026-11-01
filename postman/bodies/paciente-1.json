@@ -1,0 +1,11 @@
+{
+  "dni": "45678912",
+  "nombres": "Juan Carlos",
+  "apellidos": "Quispe Huamán",
+  "fechaNacimiento": "1990-05-15",
+  "sexo": "M",
+  "telefono": "987654321",
+  "direccion": "Av. Arequipa 1234, Lima",
+  "correo": "jquispe@example.com",
+  "estado": "A"
+}

@@ -1,0 +1,9 @@
+{
+  "cmp": "56789",
+  "nombres": "Ana Lucía",
+  "apellidos": "Torres Vega",
+  "telefono": "988777666",
+  "correo": "atorres@example.com",
+  "idEspecialidad": 2,
+  "estado": "A"
+}

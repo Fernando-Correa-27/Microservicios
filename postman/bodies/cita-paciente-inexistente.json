@@ -1,0 +1,7 @@
+{
+  "fecha": "2026-12-01",
+  "hora": "11:00:00",
+  "idPaciente": 999,
+  "idMedico": 1,
+  "motivo": "Paciente inexistente (debe fallar)"
+}

@@ -1,0 +1,11 @@
+{
+  "dni": "41234567",
+  "nombres": "María Fernanda",
+  "apellidos": "Rojas Salazar",
+  "fechaNacimiento": "1985-11-03",
+  "sexo": "F",
+  "telefono": "912345678",
+  "direccion": "Jr. Los Álamos 456, San Isidro",
+  "correo": "mrojas@example.com",
+  "estado": "A"
+}

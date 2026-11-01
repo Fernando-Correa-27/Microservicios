@@ -1,0 +1,10 @@
+{
+  "dni": "123",
+  "nombres": "",
+  "apellidos": "Prueba",
+  "fechaNacimiento": "2030-01-01",
+  "sexo": "X",
+  "telefono": "123",
+  "correo": "correo-invalido",
+  "estado": "Z"
+}

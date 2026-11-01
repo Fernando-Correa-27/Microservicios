@@ -1,0 +1,7 @@
+{
+  "fecha": "2020-01-01",
+  "hora": "10:00:00",
+  "idPaciente": 1,
+  "idMedico": 1,
+  "motivo": "Fecha pasada (debe fallar)"
+}

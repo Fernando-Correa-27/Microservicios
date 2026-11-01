@@ -1,0 +1,9 @@
+{
+  "cmp": "45678",
+  "nombres": "Carlos Alberto",
+  "apellidos": "Mendoza Ríos",
+  "telefono": "999888777",
+  "correo": "cmendoza@example.com",
+  "idEspecialidad": 1,
+  "estado": "A"
+}
