@@ -1,0 +1,305 @@
+{
+  "info": {
+    "_postman_id": "b1a2c3d4-0002-4a11-9e11-000000000002",
+    "name": "GLAB-S11 · Clínica Salud Integral (paciente, médico, cita)",
+    "description": "Colección de la actividad del laboratorio. Orden sugerido: pacientes → especialidades → médicos → horarios → citas. Las citas validan paciente y médico por HTTP; no hay FK física entre bases de datos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "pacienteUrl", "value": "http://localhost:8085" },
+    { "key": "medicoUrl", "value": "http://localhost:8086" },
+    { "key": "citaUrl", "value": "http://localhost:8087" }
+  ],
+  "item": [
+    {
+      "name": "01 · Pacientes",
+      "item": [
+        {
+          "name": "Listar pacientes",
+          "request": { "method": "GET", "header": [], "url": "{{pacienteUrl}}/api/pacientes" }
+        },
+        {
+          "name": "Obtener paciente por ID",
+          "request": { "method": "GET", "header": [], "url": "{{pacienteUrl}}/api/pacientes/1" }
+        },
+        {
+          "name": "Registrar paciente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"dni\":\"45678912\",\"nombres\":\"Juan Carlos\",\"apellidos\":\"Quispe Huamán\",\"fechaNacimiento\":\"1990-05-15\",\"sexo\":\"M\",\"telefono\":\"987654321\",\"direccion\":\"Av. Arequipa 1234, Lima\",\"correo\":\"jquispe@example.com\",\"estado\":\"A\"}"
+            },
+            "url": "{{pacienteUrl}}/api/pacientes",
+            "description": "201 Created. DNI duplicado: 409."
+          }
+        },
+        {
+          "name": "Actualizar paciente",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"dni\":\"45678912\",\"nombres\":\"Juan Carlos\",\"apellidos\":\"Quispe Huamán\",\"fechaNacimiento\":\"1990-05-15\",\"sexo\":\"M\",\"telefono\":\"987654322\",\"direccion\":\"Av. Arequipa 1234, Dpto. 501, Lima\",\"correo\":\"jquispe@example.com\",\"estado\":\"A\"}"
+            },
+            "url": "{{pacienteUrl}}/api/pacientes/1"
+          }
+        },
+        {
+          "name": "Eliminar paciente",
+          "request": { "method": "DELETE", "header": [], "url": "{{pacienteUrl}}/api/pacientes/3" }
+        }
+      ]
+    },
+    {
+      "name": "02 · Especialidades",
+      "item": [
+        {
+          "name": "Listar especialidades",
+          "request": { "method": "GET", "header": [], "url": "{{medicoUrl}}/api/especialidades" }
+        },
+        {
+          "name": "Registrar especialidad",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Cardiología\",\"descripcion\":\"Diagnóstico y tratamiento de enfermedades del corazón\",\"estado\":\"A\"}"
+            },
+            "url": "{{medicoUrl}}/api/especialidades"
+          }
+        },
+        {
+          "name": "Obtener especialidad por ID",
+          "request": { "method": "GET", "header": [], "url": "{{medicoUrl}}/api/especialidades/1" }
+        }
+      ]
+    },
+    {
+      "name": "03 · Médicos",
+      "item": [
+        {
+          "name": "Listar médicos",
+          "request": { "method": "GET", "header": [], "url": "{{medicoUrl}}/api/medicos" }
+        },
+        {
+          "name": "Obtener médico por ID",
+          "request": { "method": "GET", "header": [], "url": "{{medicoUrl}}/api/medicos/1" }
+        },
+        {
+          "name": "Registrar médico",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cmp\":\"45678\",\"nombres\":\"Carlos Alberto\",\"apellidos\":\"Mendoza Ríos\",\"telefono\":\"999888777\",\"correo\":\"cmendoza@example.com\",\"idEspecialidad\":1,\"estado\":\"A\"}"
+            },
+            "url": "{{medicoUrl}}/api/medicos",
+            "description": "201 Created. CMP duplicado: 409. Especialidad inexistente: 404."
+          }
+        },
+        {
+          "name": "Actualizar médico",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cmp\":\"45678\",\"nombres\":\"Carlos Alberto\",\"apellidos\":\"Mendoza Ríos\",\"telefono\":\"999888778\",\"correo\":\"cmendoza@example.com\",\"idEspecialidad\":1,\"estado\":\"A\"}"
+            },
+            "url": "{{medicoUrl}}/api/medicos/1"
+          }
+        },
+        {
+          "name": "Eliminar médico",
+          "request": { "method": "DELETE", "header": [], "url": "{{medicoUrl}}/api/medicos/3" }
+        }
+      ]
+    },
+    {
+      "name": "04 · Horarios",
+      "item": [
+        {
+          "name": "Listar horarios de un médico",
+          "request": { "method": "GET", "header": [], "url": "{{medicoUrl}}/api/medicos/1/horarios" }
+        },
+        {
+          "name": "Registrar horario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"diaSemana\":\"LUNES\",\"horaInicio\":\"08:00:00\",\"horaFin\":\"12:00:00\"}"
+            },
+            "url": "{{medicoUrl}}/api/medicos/1/horarios"
+          }
+        },
+        {
+          "name": "Eliminar horario",
+          "request": { "method": "DELETE", "header": [], "url": "{{medicoUrl}}/api/horarios/2" }
+        }
+      ]
+    },
+    {
+      "name": "05 · Citas",
+      "item": [
+        {
+          "name": "Listar citas",
+          "request": { "method": "GET", "header": [], "url": "{{citaUrl}}/api/citas" }
+        },
+        {
+          "name": "Obtener cita por ID",
+          "request": { "method": "GET", "header": [], "url": "{{citaUrl}}/api/citas/1" }
+        },
+        {
+          "name": "Registrar cita (valida paciente y médico)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idPaciente\":1,\"idMedico\":1,\"motivo\":\"Dolor torácico y control de presión arterial\"}"
+            },
+            "url": "{{citaUrl}}/api/citas",
+            "description": "201 Created. Fecha no pasada. Paciente/médico inexistente: 404; servicio caído: 503."
+          }
+        },
+        {
+          "name": "Confirmar cita",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"estado\":\"CONFIRMADA\"}" },
+            "url": "{{citaUrl}}/api/citas/1/estado",
+            "description": "PROGRAMADA → CONFIRMADA (200)."
+          }
+        },
+        {
+          "name": "Atender cita y registrar atención",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"estado\":\"ATENDIDA\",\"diagnostico\":\"Hipertensión arterial controlada\",\"tratamiento\":\"Enalapril 10 mg cada 12 horas por 30 días\",\"observaciones\":\"Paciente estable; control en 15 días.\"}"
+            },
+            "url": "{{citaUrl}}/api/citas/1/estado",
+            "description": "CONFIRMADA → ATENDIDA (200) y crea la atención 1:1. Sin diagnóstico: 400."
+          }
+        },
+        {
+          "name": "Consultar atención de la cita",
+          "request": { "method": "GET", "header": [], "url": "{{citaUrl}}/api/citas/1/atencion" }
+        },
+        {
+          "name": "Cancelar cita",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{citaUrl}}/api/citas/2/cancelar",
+            "description": "PROGRAMADA/CONFIRMADA → CANCELADA (200). ATENDIDA/CANCELADA: 409."
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 · Casos de error",
+      "item": [
+        {
+          "name": "400 · Paciente con datos inválidos",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"dni\":\"123\",\"nombres\":\"\",\"apellidos\":\"Prueba\",\"fechaNacimiento\":\"2030-01-01\",\"sexo\":\"X\",\"telefono\":\"123\",\"correo\":\"correo-invalido\",\"estado\":\"Z\"}"
+            },
+            "url": "{{pacienteUrl}}/api/pacientes"
+          }
+        },
+        {
+          "name": "409 · DNI duplicado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"dni\":\"45678912\",\"nombres\":\"Otro\",\"apellidos\":\"Paciente\",\"correo\":\"otro@example.com\"}"
+            },
+            "url": "{{pacienteUrl}}/api/pacientes"
+          }
+        },
+        {
+          "name": "409 · CMP duplicado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cmp\":\"45678\",\"nombres\":\"Otro\",\"apellidos\":\"Médico\",\"idEspecialidad\":1}"
+            },
+            "url": "{{medicoUrl}}/api/medicos"
+          }
+        },
+        {
+          "name": "400 · Cita con fecha pasada",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"fecha\":\"2020-01-01\",\"hora\":\"10:00:00\",\"idPaciente\":1,\"idMedico\":1,\"motivo\":\"Fecha pasada\"}"
+            },
+            "url": "{{citaUrl}}/api/citas"
+          }
+        },
+        {
+          "name": "404 · Cita con paciente inexistente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"fecha\":\"2026-12-01\",\"hora\":\"11:00:00\",\"idPaciente\":999,\"idMedico\":1,\"motivo\":\"Paciente inexistente\"}"
+            },
+            "url": "{{citaUrl}}/api/citas"
+          }
+        },
+        {
+          "name": "409 · Transición inválida PROGRAMADA → ATENDIDA",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"estado\":\"ATENDIDA\",\"diagnostico\":\"Intento inválido\"}"
+            },
+            "url": "{{citaUrl}}/api/citas/3/estado"
+          }
+        },
+        {
+          "name": "409 · Cancelar cita terminal",
+          "request": { "method": "PUT", "header": [], "url": "{{citaUrl}}/api/citas/1/cancelar" }
+        },
+        {
+          "name": "503 · Servicio dependiente caído",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"fecha\":\"2026-12-01\",\"hora\":\"11:00:00\",\"idPaciente\":1,\"idMedico\":1,\"motivo\":\"Prueba de servicio caído\"}"
+            },
+            "url": "{{citaUrl}}/api/citas",
+            "description": "Detenga paciente-service (8085) o medico-service (8086): 503 con JSON controlado."
+          }
+        }
+      ]
+    }
+  ]
+}
