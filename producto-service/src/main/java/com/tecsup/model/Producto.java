@@ -1,11 +1,13 @@
 package com.tecsup.model;
 
+import com.tecsup.dto.CategoriaDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 import java.math.BigDecimal;
 
@@ -28,6 +30,13 @@ public class Producto {
 
     @Column(name = "categoria_id", nullable = false)
     private Long categoriaId;
+
+    /**
+     * Dato remoto (GLAB-S12): NO se persiste.
+     * Se completa con OpenFeign al guardar/consultar/listar.
+     */
+    @Transient
+    private CategoriaDTO categoria;
 
     public Producto() {
     }
@@ -70,5 +79,13 @@ public class Producto {
 
     public void setCategoriaId(Long categoriaId) {
         this.categoriaId = categoriaId;
+    }
+
+    public CategoriaDTO getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(CategoriaDTO categoria) {
+        this.categoria = categoria;
     }
 }

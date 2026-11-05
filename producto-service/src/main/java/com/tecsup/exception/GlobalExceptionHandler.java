@@ -61,6 +61,24 @@ public class GlobalExceptionHandler {
         return respuesta(HttpStatus.BAD_REQUEST, "Parámetro inválido: " + ex.getName());
     }
 
+    /**
+     * GLAB-S12: el servicio remoto respondió 404.
+     */
+    @ExceptionHandler(feign.FeignException.NotFound.class)
+    public ResponseEntity<Map<String, Object>> manejarFeignNoEncontrado(feign.FeignException.NotFound ex) {
+        return respuesta(HttpStatus.NOT_FOUND, "Recurso no encontrado en el servicio remoto");
+    }
+
+    /**
+     * GLAB-S12: dependencia caída, sin instancia en Eureka, timeout o error remoto.
+     * Se devuelve 503 con JSON controlado, sin stack trace.
+     */
+    @ExceptionHandler(feign.FeignException.class)
+    public ResponseEntity<Map<String, Object>> manejarFeignError(feign.FeignException ex) {
+        return respuesta(HttpStatus.SERVICE_UNAVAILABLE,
+                "Un servicio dependiente no está disponible o respondió con error");
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> manejarGenerico(Exception ex) {
         return respuesta(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
