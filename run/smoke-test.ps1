@@ -71,12 +71,44 @@ Req "Producto precio negativo"       "POST" "$b`:8083/api/productos" '{"nombre":
 Req "Producto categoria inexistente" "POST" "$b`:8083/api/productos" '{"nombre":"Prod X","precio":10.5,"stock":5,"categoriaId":99999}' 404
 Req "Crear producto valido"          "POST" "$b`:8083/api/productos" ('{"nombre":"Smoke ' + (Get-Random) + '","precio":12.50,"stock":3,"categoriaId":1}') 201
 
-# ---------- pedido-service (8084) ----------
+# ---------- pedido-service (8084) - GLAB-S12: solo IDs + estado ----------
 Req "Listar pedidos"                 "GET"  "$b`:8084/api/pedidos" $null 200
-Req "Pedido sin detalles"            "POST" "$b`:8084/api/pedidos" ('{"fecha":"' + $hoy + '","idCliente":1,"detalles":[]}') 400
-Req "Pedido cliente inexistente"     "POST" "$b`:8084/api/pedidos" ('{"fecha":"' + $hoy + '","idCliente":99999,"detalles":[{"idProducto":1,"cantidad":1,"precio":3500}]}') 404
-Req "Pedido producto inexistente"    "POST" "$b`:8084/api/pedidos" ('{"fecha":"' + $hoy + '","idCliente":1,"detalles":[{"idProducto":99999,"cantidad":1,"precio":10}]}') 404
-Req "Crear pedido valido"            "POST" "$b`:8084/api/pedidos" ('{"fecha":"' + $hoy + '","idCliente":1,"detalles":[{"idProducto":1,"cantidad":1,"precio":3500},{"idProducto":2,"cantidad":2,"precio":89.90}]}') 201
+Req "Pedido cliente inexistente"     "POST" "$b`:8084/api/pedidos" '{"clienteId":99999,"productoId":9,"cantidad":1}' 404
+Req "Pedido producto inexistente"    "POST" "$b`:8084/api/pedidos" '{"clienteId":6,"productoId":99999,"cantidad":1}' 404
+Req "Pedido cantidad 0"              "POST" "$b`:8084/api/pedidos" '{"clienteId":6,"productoId":9,"cantidad":0}' 400
+Req "Pedido sin cantidad"            "POST" "$b`:8084/api/pedidos" '{"clienteId":6,"productoId":9}' 400
+Req "Pedido inexistente"             "GET"  "$b`:8084/api/pedidos/99999" $null 404
+Req "Crear pedido valido"            "POST" "$b`:8084/api/pedidos" '{"clienteId":6,"productoId":9,"cantidad":1}' 201
+
+# ---------- GLAB-S12: respuesta compuesta pedido + cliente + producto ----------
+$pedidoPendiente = $null
+try {
+    $lista = Invoke-RestMethod -Uri "$b`:8084/api/pedidos" -Method GET
+    $pedidoPendiente = ($lista | Where-Object { $_.estado -eq "PENDIENTE" } | Select-Object -First 1)
+    if ($pedidoPendiente) {
+        $compuesto = ($pedidoPendiente.cliente -ne $null) -and ($pedidoPendiente.producto -ne $null) -and
+                     ($pedidoPendiente.cliente.nombre -ne $null) -and ($pedidoPendiente.producto.nombre -ne $null)
+        $results.Add([pscustomobject]@{
+            Prueba   = "GET pedido compuesto (cliente+producto)"
+            Metodo   = "GET"
+            Esperado = 200
+            Obtenido = if ($compuesto) { 200 } else { 500 }
+            OK       = if ($compuesto) { "SI" } else { "NO" }
+            Detalle  = ($pedidoPendiente | ConvertTo-Json -Compress -Depth 5)
+        })
+        Write-Host ("{0,-6} {1,-6} {2,-48} esperado=200 obtenido={3}" -f $(if($compuesto){"OK"}else{"FALLA"}), "GET", "GET pedido compuesto (cliente+producto)", $(if($compuesto){200}else{500}))
+    }
+} catch {
+    Write-Host "AVISO: no se pudo validar la respuesta compuesta: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
+if ($pedidoPendiente) {
+    $id = $pedidoPendiente.id
+    Req "Anular pedido PENDIENTE"      "PUT" "$b`:8084/api/pedidos/$id/anular" $null 200
+    Req "Pedido ANULADO no se atiende" "PUT" "$b`:8084/api/pedidos/$id/atender" $null 409
+} else {
+    Write-Host "AVISO: no hay pedido PENDIENTE para probar transiciones" -ForegroundColor Yellow
+}
 
 # ---------- paciente-service (8085) ----------
 Req "Listar pacientes"               "GET"  "$b`:8085/api/pacientes" $null 200
@@ -92,11 +124,19 @@ Req "Medico especialidad inexistente" "POST" "$b`:8086/api/medicos" '{"cmp":"999
 Req "Medico cmp duplicado"           "POST" "$b`:8086/api/medicos" '{"cmp":"45678","nombres":"Test","apellidos":"Test","idEspecialidad":1}' 409
 
 # ---------- cita-service (8087) ----------
+$pacId = 2
+$medId = 1
+try {
+    $pacs = Invoke-RestMethod -Uri "$b`:8085/api/pacientes" -Method GET
+    if ($pacs) { $pacId = @($pacs)[0].idPaciente }
+    $meds = Invoke-RestMethod -Uri "$b`:8086/api/medicos" -Method GET
+    if ($meds) { $medId = @($meds)[0].idMedico }
+} catch { }
 Req "Listar citas"                   "GET"  "$b`:8087/api/citas" $null 200
-Req "Cita paciente inexistente"      "POST" "$b`:8087/api/citas" ('{"idPaciente":99999,"idMedico":1,"fecha":"' + $hoy + '","hora":"10:00:00","motivo":"x"}') 404
-Req "Cita medico inexistente"        "POST" "$b`:8087/api/citas" ('{"idPaciente":1,"idMedico":99999,"fecha":"' + $hoy + '","hora":"10:00:00","motivo":"x"}') 404
-Req "Cita sin fecha"                 "POST" "$b`:8087/api/citas" '{"idPaciente":1,"idMedico":1,"hora":"10:00:00"}' 400
-Req "Crear cita valida"              "POST" "$b`:8087/api/citas" ('{"idPaciente":1,"idMedico":1,"fecha":"2026-12-20","hora":"11:00:00","motivo":"Smoke"}') 201
+Req "Cita paciente inexistente"      "POST" "$b`:8087/api/citas" ('{"idPaciente":99999,"idMedico":' + $medId + ',"fecha":"' + $hoy + '","hora":"10:00:00","motivo":"x"}') 404
+Req "Cita medico inexistente"        "POST" "$b`:8087/api/citas" ('{"idPaciente":' + $pacId + ',"idMedico":99999,"fecha":"' + $hoy + '","hora":"10:00:00","motivo":"x"}') 404
+Req "Cita sin fecha"                 "POST" "$b`:8087/api/citas" ('{"idPaciente":' + $pacId + ',"idMedico":' + $medId + ',"hora":"10:00:00"}') 400
+Req "Crear cita valida"              "POST" "$b`:8087/api/citas" ('{"idPaciente":' + $pacId + ',"idMedico":' + $medId + ',"fecha":"2026-12-20","hora":"11:00:00","motivo":"Smoke"}') 201
 
 # ---------- Transiciones de estado ----------
 $cita = $null
@@ -115,7 +155,7 @@ if ($cita) {
 }
 
 $results | Format-Table -AutoSize -Wrap | Out-String -Width 200 | Write-Host
-$fallas = ($results | Where-Object { $_.OK -eq "NO" }).Count
+$fallas = @($results | Where-Object { $_.OK -eq "NO" }).Count
 Write-Host ""
 Write-Host ("Total: {0}  Correctas: {1}  Fallas: {2}" -f $results.Count, ($results.Count - $fallas), $fallas) -ForegroundColor $(if ($fallas -eq 0) { "Green" } else { "Red" })
 $results | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 (Join-Path $PSScriptRoot "smoke-results.json")

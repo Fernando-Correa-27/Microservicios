@@ -5,7 +5,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "[{\"apellidos\":\"PÃ©rez GÃ³mez\",\"direccion\":\"Av. Javier Prado 123, Lima\",\"estado\":\"ACTIVO\",\"id\":1,\"nombre\":\"Juan\",\"nroDni\":\"12345678\",\"telefono\":\"987654321\"},{\"apellidos\":\"RamÃ­rez Torres\",\"direccion\":\"Calle Los Olivos 456\",\"estado\":\"ACTIVO\",\"id\":2,\"nombre\":\"MarÃ­a\",\"nroDni\":\"87654321\",\"telefono\":\"912345678\"},{\"apellidos\":\"Test\",\"direccion\":\"Av. X 1\",\"estado\":\"ACTIVO\",\"id\":4,\"nombre\":\"Smoke\",\"nroDni\":\"49947581\",\"telefono\":\"900000000\"}]"
+        "Detalle":  "[{\"apellidos\":\"PÃ©rez GÃ³mez\",\"direccion\":\"Av. Javier Prado 123, San Isidro\",\"estado\":\"ACTIVO\",\"id\":1,\"nombre\":\"Juan\",\"nroDni\":\"12345678\",\"telefono\":\"987654321\"},{\"apellidos\":\"RamÃ­rez Torres\",\"direccion\":\"Calle Los Olivos 456\",\"estado\":\"ACTIVO\",\"id\":2,\"nombre\":\"MarÃ­a\",\"nroDni\":\"87654321\",\"telefono\":\"912345678\"},{\"apellidos\":\"Ramirez\",\"direccion\":\"Av. Lima 123\",\"estado\":\"ACTIVO\",\"id\":6,\"nombre\":\"Carlos\",\"nroDni\":\"45678912\",\"telefono\":\"987654321\"},{\"apellidos\":\"Lopez\",\"direccion\":\"Calle 1\",\"estado\":\"ACTIVO\",\"id\":7,\"nombre\":\"Ana\",\"nroDni\":\"11112222\",\"telefono\":\"987654321\"},{\"apellidos\":\"Test\",\"direccion\":\"Av. X 1\",\"estado\":\"ACTIVO\",\"id\":8,\"nombre\":\"Smoke\",\"nroDni\":\"36824448\",\"telefono\":\"900000000\"}]"
     },
     {
         "Prueba":  "Obtener cliente 1",
@@ -13,7 +13,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "{\"apellidos\":\"PÃ©rez GÃ³mez\",\"direccion\":\"Av. Javier Prado 123, Lima\",\"estado\":\"ACTIVO\",\"id\":1,\"nombre\":\"Juan\",\"nroDni\":\"12345678\",\"telefono\":\"987654321\"}"
+        "Detalle":  "{\"apellidos\":\"PÃ©rez GÃ³mez\",\"direccion\":\"Av. Javier Prado 123, San Isidro\",\"estado\":\"ACTIVO\",\"id\":1,\"nombre\":\"Juan\",\"nroDni\":\"12345678\",\"telefono\":\"987654321\"}"
     },
     {
         "Prueba":  "Cliente inexistente",
@@ -21,7 +21,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Cliente no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:02.3395132\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Cliente no encontrado con id: 99999\",\"timestamp\":\"2026-11-05T04:15:06.7894923\"}"
     },
     {
         "Prueba":  "Cliente id no numerico",
@@ -29,7 +29,7 @@
         "Esperado":  400,
         "Obtenido":  400,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Parámetro inválido: id\",\"timestamp\":\"2026-11-01T17:57:02.3726692\"}"
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Parámetro inválido: id\",\"timestamp\":\"2026-11-05T04:15:06.8105187\"}"
     },
     {
         "Prueba":  "Cliente sin nombre",
@@ -37,7 +37,7 @@
         "Esperado":  400,
         "Obtenido":  400,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"nombre\":\"El nombre es obligatorio\"},\"timestamp\":\"2026-11-01T17:57:02.4698195\"}"
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"nombre\":\"El nombre es obligatorio\"},\"timestamp\":\"2026-11-05T04:15:06.8400732\"}"
     },
     {
         "Prueba":  "Cliente telefono invalido",
@@ -45,7 +45,7 @@
         "Esperado":  400,
         "Obtenido":  400,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"telefono\":\"El teléfono debe tener exactamente 9 dígitos\"},\"timestamp\":\"2026-11-01T17:57:02.4779096\"}"
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"telefono\":\"El teléfono debe tener exactamente 9 dígitos\"},\"timestamp\":\"2026-11-05T04:15:06.8470881\"}"
     },
     {
         "Prueba":  "DNI duplicado",
@@ -53,7 +53,7 @@
         "Esperado":  409,
         "Obtenido":  409,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Ya existe un cliente con DNI: 12345678\",\"timestamp\":\"2026-11-01T17:57:02.7634408\"}"
+        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Ya existe un cliente con DNI: 12345678\",\"timestamp\":\"2026-11-05T04:15:06.85816\"}"
     },
     {
         "Prueba":  "Crear cliente valido",
@@ -61,7 +61,7 @@
         "Esperado":  201,
         "Obtenido":  201,
         "OK":  "SI",
-        "Detalle":  "{\"apellidos\":\"Test\",\"direccion\":\"Av. X 1\",\"estado\":\"ACTIVO\",\"id\":5,\"nombre\":\"Smoke\",\"nroDni\":\"47508276\",\"telefono\":\"900000000\"}"
+        "Detalle":  "{\"apellidos\":\"Test\",\"direccion\":\"Av. X 1\",\"estado\":\"ACTIVO\",\"id\":9,\"nombre\":\"Smoke\",\"nroDni\":\"18993601\",\"telefono\":\"900000000\"}"
     },
     {
         "Prueba":  "Listar categorias",
@@ -69,7 +69,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "[{\"id\":1,\"nombre\":\"Laptops\",\"estado\":\"ACTIVO\"},{\"id\":2,\"nombre\":\"Accesorios\",\"estado\":\"ACTIVO\"},{\"id\":3,\"nombre\":\"Impresoras\",\"estado\":\"ACTIVO\"},{\"id\":6,\"nombre\":\"Smoke 423373409\",\"estado\":\"ACTIVO\"}]"
+        "Detalle":  "[{\"id\":1,\"nombre\":\"Laptops y ultrabooks\",\"estado\":\"ACTIVO\"},{\"id\":2,\"nombre\":\"Accesorios\",\"estado\":\"ACTIVO\"},{\"id\":3,\"nombre\":\"Impresoras\",\"estado\":\"ACTIVO\"},{\"id\":8,\"nombre\":\"Laptops\",\"estado\":\"ACTIVO\"},{\"id\":9,\"nombre\":\"TecnologÃ­a\",\"estado\":\"ACTIVO\"},{\"id\":10,\"nombre\":\"Smoke 764100242\",\"estado\":\"ACTIVO\"}]"
     },
     {
         "Prueba":  "Categoria id no numerico",
@@ -77,7 +77,7 @@
         "Esperado":  400,
         "Obtenido":  400,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Parámetro inválido: id\",\"timestamp\":\"2026-11-01T17:57:03.2499344\"}"
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Parámetro inválido: id\",\"timestamp\":\"2026-11-05T04:15:06.9230686\"}"
     },
     {
         "Prueba":  "Categoria inexistente",
@@ -85,7 +85,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Categoría no encontrada con id: 99999\",\"timestamp\":\"2026-11-01T17:57:03.2791665\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Categoría no encontrada con id: 99999\",\"timestamp\":\"2026-11-05T04:15:06.9316046\"}"
     },
     {
         "Prueba":  "Categoria nombre vacio",
@@ -93,7 +93,7 @@
         "Esperado":  400,
         "Obtenido":  400,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"nombre\":\"El nombre es obligatorio\"},\"timestamp\":\"2026-11-01T17:57:03.3594298\"}"
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"nombre\":\"El nombre es obligatorio\"},\"timestamp\":\"2026-11-05T04:15:06.9366134\"}"
     },
     {
         "Prueba":  "Actualizar categoria inexistente",
@@ -101,7 +101,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Categoría no encontrada con id: 99999\",\"timestamp\":\"2026-11-01T17:57:03.3719531\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Categoría no encontrada con id: 99999\",\"timestamp\":\"2026-11-05T04:15:06.9456358\"}"
     },
     {
         "Prueba":  "Crear categoria valida",
@@ -109,7 +109,7 @@
         "Esperado":  201,
         "Obtenido":  201,
         "OK":  "SI",
-        "Detalle":  "{\"id\":7,\"nombre\":\"Smoke 1915901188\",\"estado\":\"ACTIVO\"}"
+        "Detalle":  "{\"id\":11,\"nombre\":\"Smoke 1068203667\",\"estado\":\"ACTIVO\"}"
     },
     {
         "Prueba":  "Listar productos",
@@ -117,7 +117,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "[{\"categoriaId\":1,\"id\":1,\"nombre\":\"Laptop Lenovo ThinkPad\",\"precio\":3500.00,\"stock\":15},{\"categoriaId\":2,\"id\":2,\"nombre\":\"Mouse Logitech M185\",\"precio\":89.90,\"stock\":50},{\"categoriaId\":2,\"id\":3,\"nombre\":\"Teclado MecÃ¡nico Redragon\",\"precio\":199.99,\"stock\":25},{\"categoriaId\":1,\"id\":5,\"nombre\":\"Smoke 135572365\",\"precio\":12.50,\"stock\":3},{\"categoriaId\":1,\"id\":6,\"nombre\":\"Recuperado\",\"precio\":10.00,\"stock\":1}]"
+        "Detalle":  "[{\"categoria\":{\"id\":1,\"nombre\":\"Laptops y ultrabooks\",\"estado\":\"ACTIVO\"},\"categoriaId\":1,\"id\":1,\"nombre\":\"Laptop Lenovo ThinkPad E14\",\"precio\":3799.00,\"stock\":10},{\"categoria\":{\"id\":2,\"nombre\":\"Accesorios\",\"estado\":\"ACTIVO\"},\"categoriaId\":2,\"id\":2,\"nombre\":\"Mouse Logitech M185\",\"precio\":89.90,\"stock\":50},{\"categoria\":{\"id\":2,\"nombre\":\"Accesorios\",\"estado\":\"ACTIVO\"},\"categoriaId\":2,\"id\":3,\"nombre\":\"Teclado MecÃ¡nico Redragon\",\"precio\":199.99,\"stock\":25},{\"categoria\":{\"id\":1,\"nombre\":\"Laptops y ultrabooks\",\"estado\":\"ACTIVO\"},\"categoriaId\":1,\"id\":8,\"nombre\":\"Laptop Lenovo ThinkPad\",\"precio\":3500.00,\"stock\":15},{\"categoria\":{\"id\":9,\"nombre\":\"TecnologÃ­a\",\"estado\":\"ACTIVO\"},\"categoriaId\":9,\"id\":9,\"nombre\":\"Laptop\",\"precio\":2500.00,\"stock\":10},{\"categoria\":{\"id\":1,\"nombre\":\"Laptops y ultrabooks\",\"estado\":\"ACTIVO\"},\"categoriaId\":1,\"id\":10,\"nombre\":\"Smoke 375588966\",\"precio\":12.50,\"stock\":3}]"
     },
     {
         "Prueba":  "Producto inexistente",
@@ -125,7 +125,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Producto no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:03.8803561\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Producto no encontrado con id: 99999\",\"timestamp\":\"2026-11-05T04:15:07.0530821\"}"
     },
     {
         "Prueba":  "Producto precio negativo",
@@ -133,7 +133,7 @@
         "Esperado":  400,
         "Obtenido":  400,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"precio\":\"El precio no puede ser negativo\"},\"timestamp\":\"2026-11-01T17:57:04.0020043\"}"
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"precio\":\"El precio debe ser mayor a cero\"},\"timestamp\":\"2026-11-05T04:15:07.0606225\"}"
     },
     {
         "Prueba":  "Producto categoria inexistente",
@@ -141,7 +141,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Categoría no encontrada con id: 99999\",\"timestamp\":\"2026-11-01T17:57:04.1420876\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Recurso no encontrado en el servicio remoto\",\"timestamp\":\"2026-11-05T04:15:07.0757405\"}"
     },
     {
         "Prueba":  "Crear producto valido",
@@ -149,7 +149,7 @@
         "Esperado":  201,
         "Obtenido":  201,
         "OK":  "SI",
-        "Detalle":  "{\"categoriaId\":1,\"id\":7,\"nombre\":\"Smoke 1891151698\",\"precio\":12.50,\"stock\":3}"
+        "Detalle":  "{\"categoria\":{\"id\":1,\"nombre\":\"Laptops y ultrabooks\",\"estado\":\"ACTIVO\"},\"categoriaId\":1,\"id\":11,\"nombre\":\"Smoke 811490747\",\"precio\":12.50,\"stock\":3}"
     },
     {
         "Prueba":  "Listar pedidos",
@@ -157,15 +157,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "[{\"detalles\":[{\"cantidad\":1,\"idDetalle\":1,\"idProducto\":1,\"precio\":3500.00},{\"cantidad\":2,\"idDetalle\":2,\"idProducto\":2,\"precio\":89.90}],\"fecha\":\"2026-06-10\",\"idCliente\":1,\"idPedido\":1,\"total\":3679.80},{\"detalles\":[{\"cantidad\":1,\"idDetalle\":5,\"idProducto\":1,\"precio\":3500.00},{\"cantidad\":2,\"idDetalle\":6,\"idProducto\":2,\"precio\":89.90}],\"fecha\":\"2026-11-01\",\"idCliente\":1,\"idPedido\":3,\"total\":3679.80}]"
-    },
-    {
-        "Prueba":  "Pedido sin detalles",
-        "Metodo":  "POST",
-        "Esperado":  400,
-        "Obtenido":  400,
-        "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"detalles\":\"El pedido debe tener al menos un detalle\"},\"timestamp\":\"2026-11-01T17:57:04.8385816\"}"
+        "Detalle":  "[{\"cantidad\":2,\"cliente\":{\"apellido\":\"Ramirez\",\"id\":6,\"nombre\":\"Carlos\"},\"estado\":\"ATENDIDO\",\"id\":1,\"producto\":{\"id\":9,\"nombre\":\"Laptop\",\"precio\":2500.00}},{\"cantidad\":3,\"cliente\":{\"apellido\":\"Lopez\",\"id\":7,\"nombre\":\"Ana\"},\"estado\":\"ANULADO\",\"id\":2,\"producto\":{\"id\":9,\"nombre\":\"Laptop\",\"precio\":2500.00}},{\"cantidad\":1,\"cliente\":{\"apellido\":\"Ramirez\",\"id\":6,\"nombre\":\"Carlos\"},\"estado\":\"ANULADO\",\"id\":3,\"producto\":{\"id\":9,\"nombre\":\"Laptop\",\"precio\":2500.00}}]"
     },
     {
         "Prueba":  "Pedido cliente inexistente",
@@ -173,7 +165,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Cliente no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:04.9651417\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Cliente no encontrado con id: 99999\",\"timestamp\":\"2026-11-05T04:15:07.2257819\"}"
     },
     {
         "Prueba":  "Pedido producto inexistente",
@@ -181,7 +173,31 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Producto no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:04.9940577\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Producto no encontrado con id: 99999\",\"timestamp\":\"2026-11-05T04:15:07.2483001\"}"
+    },
+    {
+        "Prueba":  "Pedido cantidad 0",
+        "Metodo":  "POST",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"cantidad\":\"La cantidad debe ser mayor a cero\"},\"timestamp\":\"2026-11-05T04:15:07.2533165\"}"
+    },
+    {
+        "Prueba":  "Pedido sin cantidad",
+        "Metodo":  "POST",
+        "Esperado":  400,
+        "Obtenido":  400,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"cantidad\":\"La cantidad es obligatoria\"},\"timestamp\":\"2026-11-05T04:15:07.2598217\"}"
+    },
+    {
+        "Prueba":  "Pedido inexistente",
+        "Metodo":  "GET",
+        "Esperado":  404,
+        "Obtenido":  404,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Pedido no encontrado con id: 99999\",\"timestamp\":\"2026-11-05T04:15:07.2708483\"}"
     },
     {
         "Prueba":  "Crear pedido valido",
@@ -189,7 +205,31 @@
         "Esperado":  201,
         "Obtenido":  201,
         "OK":  "SI",
-        "Detalle":  "{\"detalles\":[{\"cantidad\":1,\"idDetalle\":7,\"idProducto\":1,\"precio\":3500},{\"cantidad\":2,\"idDetalle\":8,\"idProducto\":2,\"precio\":89.90}],\"fecha\":\"2026-11-01\",\"idCliente\":1,\"idPedido\":4,\"total\":3679.80}"
+        "Detalle":  "{\"cantidad\":1,\"cliente\":{\"apellido\":\"Ramirez\",\"id\":6,\"nombre\":\"Carlos\"},\"estado\":\"PENDIENTE\",\"id\":4,\"producto\":{\"id\":9,\"nombre\":\"Laptop\",\"precio\":2500.00}}"
+    },
+    {
+        "Prueba":  "GET pedido compuesto (cliente+producto)",
+        "Metodo":  "GET",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "{\"cantidad\":1,\"cliente\":{\"apellido\":\"Ramirez\",\"id\":6,\"nombre\":\"Carlos\"},\"estado\":\"PENDIENTE\",\"id\":4,\"producto\":{\"id\":9,\"nombre\":\"Laptop\",\"precio\":2500.00}}"
+    },
+    {
+        "Prueba":  "Anular pedido PENDIENTE",
+        "Metodo":  "PUT",
+        "Esperado":  200,
+        "Obtenido":  200,
+        "OK":  "SI",
+        "Detalle":  "{\"cantidad\":1,\"cliente\":{\"apellido\":\"Ramirez\",\"id\":6,\"nombre\":\"Carlos\"},\"estado\":\"ANULADO\",\"id\":4,\"producto\":{\"id\":9,\"nombre\":\"Laptop\",\"precio\":2500.00}}"
+    },
+    {
+        "Prueba":  "Pedido ANULADO no se atiende",
+        "Metodo":  "PUT",
+        "Esperado":  409,
+        "Obtenido":  409,
+        "OK":  "SI",
+        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Transición no permitida: ANULADO -\u003e ATENDIDO. Solo un pedido PENDIENTE puede cambiar de estado\",\"timestamp\":\"2026-11-05T04:15:07.5247503\"}"
     },
     {
         "Prueba":  "Listar pacientes",
@@ -197,7 +237,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "[{\"apellidos\":\"Quispe HuamÃ¡n\",\"correo\":\"jquispe@example.com\",\"direccion\":\"Av. Arequipa 1234, Lima\",\"dni\":\"45678912\",\"estado\":\"A\",\"fechaNacimiento\":\"1990-05-15\",\"idPaciente\":1,\"nombres\":\"Juan Carlos\",\"sexo\":\"M\",\"telefono\":\"987654321\"},{\"apellidos\":\"Rojas Salazar\",\"correo\":\"mrojas@example.com\",\"direccion\":\"Jr. Los Ãlamos 456, San Isidro\",\"dni\":\"41234567\",\"estado\":\"A\",\"fechaNacimiento\":\"1985-11-03\",\"idPaciente\":2,\"nombres\":\"MarÃ­a Fernanda\",\"sexo\":\"F\",\"telefono\":\"912345678\"}]"
+        "Detalle":  "[{\"apellidos\":\"Rojas Salazar\",\"correo\":\"mrojas@example.com\",\"direccion\":\"Jr. Los Ãlamos 456, San Isidro\",\"dni\":\"41234567\",\"estado\":\"A\",\"fechaNacimiento\":\"1985-11-03\",\"idPaciente\":2,\"nombres\":\"MarÃ­a Fernanda\",\"sexo\":\"F\",\"telefono\":\"912345678\"},{\"apellidos\":\"Quispe HuamÃ¡n\",\"correo\":\"jquispe@example.com\",\"direccion\":\"Av. Arequipa 1234, Lima\",\"dni\":\"45678912\",\"estado\":\"A\",\"fechaNacimiento\":\"1990-05-15\",\"idPaciente\":3,\"nombres\":\"Juan Carlos\",\"sexo\":\"M\",\"telefono\":\"987654321\"}]"
     },
     {
         "Prueba":  "Paciente inexistente",
@@ -205,7 +245,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Paciente no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:05.4996451\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Paciente no encontrado con id: 99999\",\"timestamp\":\"2026-11-05T04:15:07.5609131\"}"
     },
     {
         "Prueba":  "Paciente dni invalido",
@@ -213,7 +253,7 @@
         "Esperado":  400,
         "Obtenido":  400,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"dni\":\"El DNI debe tener exactamente 8 dígitos\"},\"timestamp\":\"2026-11-01T17:57:05.60307\"}"
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"dni\":\"El DNI debe tener exactamente 8 dígitos\"},\"timestamp\":\"2026-11-05T04:15:07.5659485\"}"
     },
     {
         "Prueba":  "Paciente dni duplicado",
@@ -221,7 +261,7 @@
         "Esperado":  409,
         "Obtenido":  409,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Ya existe un paciente con DNI: 45678912\",\"timestamp\":\"2026-11-01T17:57:05.8600386\"}"
+        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Ya existe un paciente con DNI: 45678912\",\"timestamp\":\"2026-11-05T04:15:07.5769239\"}"
     },
     {
         "Prueba":  "Listar especialidades",
@@ -229,7 +269,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "[{\"descripcion\":\"DiagnÃ³stico y tratamiento de enfermedades del corazÃ³n\",\"estado\":\"A\",\"idEspecialidad\":1,\"nombre\":\"CardiologÃ­a\"},{\"descripcion\":\"AtenciÃ³n integral de niÃ±os y adolescentes\",\"estado\":\"A\",\"idEspecialidad\":2,\"nombre\":\"PediatrÃ­a\"}]"
+        "Detalle":  "[{\"descripcion\":\"DiagnÃ³stico y tratamiento de enfermedades del corazÃ³n\",\"estado\":\"A\",\"idEspecialidad\":1,\"nombre\":\"CardiologÃ­a\"},{\"descripcion\":\"AtenciÃ³n integral de niÃ±os y adolescentes\",\"estado\":\"A\",\"idEspecialidad\":2,\"nombre\":\"PediatrÃ­a\"},{\"descripcion\":\"DiagnÃ³stico y tratamiento de enfermedades del corazÃ³n\",\"estado\":\"A\",\"idEspecialidad\":3,\"nombre\":\"CardiologÃ­a\"}]"
     },
     {
         "Prueba":  "Listar medicos",
@@ -245,7 +285,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Médico no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:06.2744006\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Médico no encontrado con id: 99999\",\"timestamp\":\"2026-11-05T04:15:07.6420435\"}"
     },
     {
         "Prueba":  "Medico especialidad inexistente",
@@ -253,7 +293,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Especialidad no encontrada con id: 99999\",\"timestamp\":\"2026-11-01T17:57:06.6116178\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Especialidad no encontrada con id: 99999\",\"timestamp\":\"2026-11-05T04:15:07.6540883\"}"
     },
     {
         "Prueba":  "Medico cmp duplicado",
@@ -261,7 +301,7 @@
         "Esperado":  409,
         "Obtenido":  409,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Ya existe un médico con CMP: 45678\",\"timestamp\":\"2026-11-01T17:57:06.6249165\"}"
+        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Ya existe un médico con CMP: 45678\",\"timestamp\":\"2026-11-05T04:15:07.6631565\"}"
     },
     {
         "Prueba":  "Listar citas",
@@ -269,7 +309,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "[{\"estado\":\"ATENDIDA\",\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idCita\":1,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Dolor torÃ¡cico y control de presiÃ³n arterial\"},{\"estado\":\"CANCELADA\",\"fecha\":\"2026-11-16\",\"hora\":\"10:00:00\",\"idCita\":2,\"idMedico\":2,\"idPaciente\":2,\"motivo\":\"Control pediÃ¡trico y vacunaciÃ³n\"},{\"estado\":\"ATENDIDA\",\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idCita\":3,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Dolor torÃ¡cico y control de presiÃ³n arterial\"},{\"estado\":\"CONFIRMADA\",\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idCita\":4,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Dolor torÃ¡cico y control de presiÃ³n arterial\"},{\"estado\":\"PROGRAMADA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":7,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Smoke\"}]"
+        "Detalle":  "[{\"estado\":\"ATENDIDA\",\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idCita\":1,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Dolor torÃ¡cico y control de presiÃ³n arterial\"},{\"estado\":\"CANCELADA\",\"fecha\":\"2026-11-16\",\"hora\":\"10:00:00\",\"idCita\":2,\"idMedico\":2,\"idPaciente\":2,\"motivo\":\"Control pediÃ¡trico y vacunaciÃ³n\"},{\"estado\":\"ATENDIDA\",\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idCita\":3,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Dolor torÃ¡cico y control de presiÃ³n arterial\"},{\"estado\":\"CONFIRMADA\",\"fecha\":\"2026-11-15\",\"hora\":\"09:30:00\",\"idCita\":4,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Dolor torÃ¡cico y control de presiÃ³n arterial\"}]"
     },
     {
         "Prueba":  "Cita paciente inexistente",
@@ -277,7 +317,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Paciente no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:07.2365636\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Paciente no encontrado con id: 99999\",\"timestamp\":\"2026-11-05T04:15:07.7417448\"}"
     },
     {
         "Prueba":  "Cita medico inexistente",
@@ -285,7 +325,7 @@
         "Esperado":  404,
         "Obtenido":  404,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Médico no encontrado con id: 99999\",\"timestamp\":\"2026-11-01T17:57:07.2760428\"}"
+        "Detalle":  "{\"codigo\":\"404\",\"mensaje\":\"Médico no encontrado con id: 99999\",\"timestamp\":\"2026-11-05T04:15:07.7656807\"}"
     },
     {
         "Prueba":  "Cita sin fecha",
@@ -293,7 +333,7 @@
         "Esperado":  400,
         "Obtenido":  400,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"fecha\":\"La fecha es obligatoria\"},\"timestamp\":\"2026-11-01T17:57:07.2886251\"}"
+        "Detalle":  "{\"codigo\":\"400\",\"mensaje\":\"Error de validación en la petición\",\"errores\":{\"fecha\":\"La fecha es obligatoria\"},\"timestamp\":\"2026-11-05T04:15:07.7726798\"}"
     },
     {
         "Prueba":  "Crear cita valida",
@@ -301,7 +341,7 @@
         "Esperado":  201,
         "Obtenido":  201,
         "OK":  "SI",
-        "Detalle":  "{\"estado\":\"PROGRAMADA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":8,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Smoke\"}"
+        "Detalle":  "{\"estado\":\"PROGRAMADA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":9,\"idMedico\":1,\"idPaciente\":2,\"motivo\":\"Smoke\"}"
     },
     {
         "Prueba":  "Transicion PROGRAMADA-\u003eCONFIRMADA",
@@ -309,7 +349,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "{\"estado\":\"CONFIRMADA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":7,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Smoke\"}"
+        "Detalle":  "{\"estado\":\"CONFIRMADA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":9,\"idMedico\":1,\"idPaciente\":2,\"motivo\":\"Smoke\"}"
     },
     {
         "Prueba":  "Transicion CONFIRMADA-\u003eATENDIDA",
@@ -317,7 +357,7 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "{\"estado\":\"ATENDIDA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":7,\"idMedico\":1,\"idPaciente\":1,\"motivo\":\"Smoke\"}"
+        "Detalle":  "{\"estado\":\"ATENDIDA\",\"fecha\":\"2026-12-20\",\"hora\":\"11:00:00\",\"idCita\":9,\"idMedico\":1,\"idPaciente\":2,\"motivo\":\"Smoke\"}"
     },
     {
         "Prueba":  "Cita terminal no cambia",
@@ -325,7 +365,7 @@
         "Esperado":  409,
         "Obtenido":  409,
         "OK":  "SI",
-        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Transición no permitida: ATENDIDA -\u003e CANCELADA. Estados terminales: ATENDIDA y CANCELADA\",\"timestamp\":\"2026-11-01T17:57:07.5899416\"}"
+        "Detalle":  "{\"codigo\":\"409\",\"mensaje\":\"Transición no permitida: ATENDIDA -\u003e CANCELADA. Estados terminales: ATENDIDA y CANCELADA\",\"timestamp\":\"2026-11-05T04:15:07.9217945\"}"
     },
     {
         "Prueba":  "Obtener atencion de la cita",
@@ -333,6 +373,6 @@
         "Esperado":  200,
         "Obtenido":  200,
         "OK":  "SI",
-        "Detalle":  "{\"diagnostico\":\"Control\",\"fechaRegistro\":\"2026-11-01T17:57:08\",\"idAtencion\":4,\"observaciones\":\"OK\",\"tratamiento\":\"Reposo\"}"
+        "Detalle":  "{\"diagnostico\":\"Control\",\"fechaRegistro\":\"2026-11-05T04:15:08\",\"idAtencion\":6,\"observaciones\":\"OK\",\"tratamiento\":\"Reposo\"}"
     }
 ]
