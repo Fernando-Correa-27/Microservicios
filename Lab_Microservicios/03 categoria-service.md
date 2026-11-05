@@ -57,3 +57,16 @@ curl.exe -s -X POST http://localhost:8082/api/categorias `
 - [[02 Arquitectura de microservicios]]
 - [[04 producto-service]] (consumidor)
 - [[14 Guía original y problemas detectados]]
+
+## S12 · categoria-service como cliente de Eureka
+
+- Se agregó `spring-cloud-starter-netflix-eureka-client` y `@EnableDiscoveryClient`.
+- Se agregó la sección `eureka:` en `application-dev.yml` con `defaultZone: http://localhost:8761/eureka`.
+- **No cambió** el CRUD ni el puerto 8082. Sigue siendo el proveedor de categorías para producto-service.
+
+> [!warning] Ruta sin tilde
+> La colección Postman de la guía usaba `/api/categorías` (con tilde), pero el `@FeignClient` usa `/api/categorias`. Se estandarizó **sin tilde** en código, pruebas y colección.
+
+Verificación real: `GET http://localhost:8761/eureka/apps` mostró `CATEGORIA-SERVICE -> UP`. El nombre con tilde `"Tecnología"` se guardó y recuperó correctamente en UTF-8.
+
+Enlaces: [[18 Eureka y service discovery]] · [[12 Pruebas HTTP]]

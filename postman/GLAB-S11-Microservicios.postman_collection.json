@@ -1,256 +1,491 @@
 {
-  "info": {
-    "_postman_id": "b1a2c3d4-0001-4a11-9e11-000000000001",
-    "name": "GLAB-S11 · Microservicios (categoría, producto, cliente, pedido)",
-    "description": "Colección del laboratorio GLAB-S11. Cada request usa variables de colección para el puerto del servicio. Orden sugerido: categorías → productos → clientes → pedidos.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "variable": [
-    { "key": "categoriaUrl", "value": "http://localhost:8082" },
-    { "key": "productoUrl", "value": "http://localhost:8083" },
-    { "key": "clienteUrl", "value": "http://localhost:8081" },
-    { "key": "pedidoUrl", "value": "http://localhost:8084" }
-  ],
-  "item": [
-    {
-      "name": "01 · Categorías",
-      "item": [
-        {
-          "name": "Listar categorías",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{categoriaUrl}}/api/categorias",
-            "description": "200 OK con el arreglo de categorías."
-          }
-        },
-        {
-          "name": "Obtener categoría por ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{categoriaUrl}}/api/categorias/1",
-            "description": "200 OK. Con un ID inexistente devuelve 404 JSON."
-          }
-        },
-        {
-          "name": "Crear categoría",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"nombre\":\"Laptops\",\"estado\":\"ACTIVO\"}"
-            },
-            "url": "{{categoriaUrl}}/api/categorias",
-            "description": "201 Created."
-          }
-        },
-        {
-          "name": "Actualizar categoría",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"nombre\":\"Laptops y ultrabooks\",\"estado\":\"ACTIVO\"}"
-            },
-            "url": "{{categoriaUrl}}/api/categorias/1",
-            "description": "200 OK."
-          }
-        },
-        {
-          "name": "Eliminar categoría",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": "{{categoriaUrl}}/api/categorias/4",
-            "description": "200 OK con mensaje. 404 si no existe."
-          }
-        }
-      ]
-    },
-    {
-      "name": "02 · Productos",
-      "item": [
-        {
-          "name": "Listar productos",
-          "request": { "method": "GET", "header": [], "url": "{{productoUrl}}/api/productos" }
-        },
-        {
-          "name": "Obtener producto por ID",
-          "request": { "method": "GET", "header": [], "url": "{{productoUrl}}/api/productos/1" }
-        },
-        {
-          "name": "Crear producto (valida categoría por HTTP)",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"nombre\":\"Laptop Lenovo ThinkPad\",\"precio\":3500.00,\"stock\":15,\"categoriaId\":1}"
-            },
-            "url": "{{productoUrl}}/api/productos",
-            "description": "201 Created si categoriaId existe en categoria-service; 404 si no existe; 503 si categoria-service está caído."
-          }
-        },
-        {
-          "name": "Actualizar producto",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"nombre\":\"Laptop Lenovo ThinkPad E14\",\"precio\":3799.00,\"stock\":10,\"categoriaId\":1}"
-            },
-            "url": "{{productoUrl}}/api/productos/1"
-          }
-        },
-        {
-          "name": "Eliminar producto",
-          "request": { "method": "DELETE", "header": [], "url": "{{productoUrl}}/api/productos/4" }
-        }
-      ]
-    },
-    {
-      "name": "03 · Clientes",
-      "item": [
-        {
-          "name": "Listar clientes",
-          "request": { "method": "GET", "header": [], "url": "{{clienteUrl}}/api/clientes" }
-        },
-        {
-          "name": "Obtener cliente por ID",
-          "request": { "method": "GET", "header": [], "url": "{{clienteUrl}}/api/clientes/1" }
-        },
-        {
-          "name": "Crear cliente",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"nombre\":\"Juan\",\"apellidos\":\"Pérez Gómez\",\"direccion\":\"Av. Javier Prado 123, Lima\",\"telefono\":\"987654321\",\"nroDni\":\"12345678\",\"estado\":\"ACTIVO\"}"
-            },
-            "url": "{{clienteUrl}}/api/clientes",
-            "description": "201 Created. DNI duplicado: 409."
-          }
-        },
-        {
-          "name": "Actualizar cliente",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"nombre\":\"Juan\",\"apellidos\":\"Pérez Gómez\",\"direccion\":\"Av. Javier Prado 123, San Isidro\",\"telefono\":\"987654321\",\"nroDni\":\"12345678\",\"estado\":\"ACTIVO\"}"
-            },
-            "url": "{{clienteUrl}}/api/clientes/1"
-          }
-        },
-        {
-          "name": "Eliminar cliente",
-          "request": { "method": "DELETE", "header": [], "url": "{{clienteUrl}}/api/clientes/3" }
-        }
-      ]
-    },
-    {
-      "name": "04 · Pedidos",
-      "item": [
-        {
-          "name": "Listar pedidos",
-          "request": { "method": "GET", "header": [], "url": "{{pedidoUrl}}/api/pedidos" }
-        },
-        {
-          "name": "Obtener pedido por ID",
-          "request": { "method": "GET", "header": [], "url": "{{pedidoUrl}}/api/pedidos/1" }
-        },
-        {
-          "name": "Crear pedido (valida cliente y productos)",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"fecha\":\"2026-06-10\",\"idCliente\":1,\"total\":3679.80,\"detalles\":[{\"idProducto\":1,\"cantidad\":1,\"precio\":3500.00},{\"idProducto\":2,\"cantidad\":2,\"precio\":89.90}]}"
-            },
-            "url": "{{pedidoUrl}}/api/pedidos",
-            "description": "201 Created. El servidor recalcula el total a partir de los detalles. Valida idCliente y cada idProducto por HTTP."
-          }
-        },
-        {
-          "name": "Actualizar pedido (reemplaza detalles)",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"fecha\":\"2026-06-11\",\"idCliente\":1,\"detalles\":[{\"idProducto\":2,\"cantidad\":3,\"precio\":89.90}]}"
-            },
-            "url": "{{pedidoUrl}}/api/pedidos/1",
-            "description": "200 OK. Los detalles anteriores se eliminan (orphanRemoval) y se insertan los nuevos."
-          }
-        },
-        {
-          "name": "Eliminar pedido",
-          "request": { "method": "DELETE", "header": [], "url": "{{pedidoUrl}}/api/pedidos/3" }
-        }
-      ]
-    },
-    {
-      "name": "05 · Casos de error",
-      "item": [
-        {
-          "name": "400 · Categoría sin nombre ni estado",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\"nombre\":\"\",\"estado\":\"\"}" },
-            "url": "{{categoriaUrl}}/api/categorias"
-          }
-        },
-        {
-          "name": "404 · Categoría inexistente",
-          "request": { "method": "GET", "header": [], "url": "{{categoriaUrl}}/api/categorias/999" }
-        },
-        {
-          "name": "404 · Producto con categoría inexistente",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"nombre\":\"Producto X\",\"precio\":10.00,\"stock\":1,\"categoriaId\":999}"
-            },
-            "url": "{{productoUrl}}/api/productos"
-          }
-        },
-        {
-          "name": "404 · Pedido con cliente inexistente",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"fecha\":\"2026-06-10\",\"idCliente\":999,\"detalles\":[{\"idProducto\":1,\"cantidad\":1,\"precio\":3500.00}]}"
-            },
-            "url": "{{pedidoUrl}}/api/pedidos"
-          }
-        },
-        {
-          "name": "503 · Servicio dependiente caído",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"fecha\":\"2026-06-10\",\"idCliente\":1,\"detalles\":[{\"idProducto\":1,\"cantidad\":1,\"precio\":3500.00}]}"
-            },
-            "url": "{{pedidoUrl}}/api/pedidos",
-            "description": "Detenga producto-service y ejecute este request: 503 con JSON controlado."
-          }
-        }
-      ]
-    }
-  ]
+    "info":  {
+                 "_postman_id":  "b1a2c3d4-0001-4a11-9e11-000000000001",
+                 "name":  "GLAB-S11/S12 · Microservicios (categoría, producto, cliente, pedido)",
+                 "description":  "Colección histórica de GLAB-S11 actualizada al contrato de GLAB-S12 (pedido con IDs + estado, sin DELETE). Para Eureka y OpenFeign use GLAB-S12-Microservicios.postman_collection.json.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "variable":  [
+                     {
+                         "key":  "categoriaUrl",
+                         "value":  "http://localhost:8082"
+                     },
+                     {
+                         "key":  "productoUrl",
+                         "value":  "http://localhost:8083"
+                     },
+                     {
+                         "key":  "clienteUrl",
+                         "value":  "http://localhost:8081"
+                     },
+                     {
+                         "key":  "pedidoUrl",
+                         "value":  "http://localhost:8084"
+                     }
+                 ],
+    "item":  [
+                 {
+                     "name":  "01 · Categorías",
+                     "item":  [
+                                  {
+                                      "name":  "Listar categorías",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{categoriaUrl}}/api/categorias",
+                                                      "description":  "200 OK con el arreglo de categorías."
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Obtener categoría por ID",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{categoriaUrl}}/api/categorias/1",
+                                                      "description":  "200 OK. Con un ID inexistente devuelve 404 JSON."
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Crear categoría",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"nombre\":\"Laptops\",\"estado\":\"ACTIVO\"}"
+                                                               },
+                                                      "url":  "{{categoriaUrl}}/api/categorias",
+                                                      "description":  "201 Created."
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Actualizar categoría",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"nombre\":\"Laptops y ultrabooks\",\"estado\":\"ACTIVO\"}"
+                                                               },
+                                                      "url":  "{{categoriaUrl}}/api/categorias/1",
+                                                      "description":  "200 OK."
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Eliminar categoría",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{categoriaUrl}}/api/categorias/4",
+                                                      "description":  "200 OK con mensaje. 404 si no existe."
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "02 · Productos",
+                     "item":  [
+                                  {
+                                      "name":  "Listar productos",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{productoUrl}}/api/productos"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Obtener producto por ID",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{productoUrl}}/api/productos/1"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Crear producto (valida categoría por HTTP)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"nombre\":\"Laptop Lenovo ThinkPad\",\"precio\":3500.00,\"stock\":15,\"categoriaId\":1}"
+                                                               },
+                                                      "url":  "{{productoUrl}}/api/productos",
+                                                      "description":  "201 Created si categoriaId existe en categoria-service; 404 si no existe; 503 si categoria-service está caído."
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Actualizar producto",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"nombre\":\"Laptop Lenovo ThinkPad E14\",\"precio\":3799.00,\"stock\":10,\"categoriaId\":1}"
+                                                               },
+                                                      "url":  "{{productoUrl}}/api/productos/1"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Eliminar producto",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{productoUrl}}/api/productos/4"
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "03 · Clientes",
+                     "item":  [
+                                  {
+                                      "name":  "Listar clientes",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{clienteUrl}}/api/clientes"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Obtener cliente por ID",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{clienteUrl}}/api/clientes/1"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Crear cliente",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"nombre\":\"Juan\",\"apellidos\":\"Pérez Gómez\",\"direccion\":\"Av. Javier Prado 123, Lima\",\"telefono\":\"987654321\",\"nroDni\":\"12345678\",\"estado\":\"ACTIVO\"}"
+                                                               },
+                                                      "url":  "{{clienteUrl}}/api/clientes",
+                                                      "description":  "201 Created. DNI duplicado: 409."
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Actualizar cliente",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"nombre\":\"Juan\",\"apellidos\":\"Pérez Gómez\",\"direccion\":\"Av. Javier Prado 123, San Isidro\",\"telefono\":\"987654321\",\"nroDni\":\"12345678\",\"estado\":\"ACTIVO\"}"
+                                                               },
+                                                      "url":  "{{clienteUrl}}/api/clientes/1"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Eliminar cliente",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{clienteUrl}}/api/clientes/3"
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "04 · Pedidos",
+                     "item":  [
+                                  {
+                                      "name":  "Listar pedidos (tolerante a fallos remotos)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{pedidoUrl}}/api/pedidos"
+                                                  },
+                                      "description":  "Si un servicio remoto está caído, el pedido se devuelve con cliente/producto en null sin romper el listado."
+                                  },
+                                  {
+                                      "name":  "Crear pedido",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json; charset=utf-8"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"clienteId\":6,\"productoId\":9,\"cantidad\":2}"
+                                                               },
+                                                      "url":  "{{pedidoUrl}}/api/pedidos",
+                                                      "description":  "201 Created. Valida cliente y producto por Feign antes de guardar; estado inicial PENDIENTE."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027201 Created\u0027, () =\u003e pm.response.to.have.status(201));",
+                                                                                    "const p = pm.response.json();",
+                                                                                    "pm.test(\u0027estado PENDIENTE\u0027, () =\u003e pm.expect(p.estado).to.eql(\u0027PENDIENTE\u0027));",
+                                                                                    "pm.test(\u0027cliente y producto anidados\u0027, () =\u003e {",
+                                                                                    "  pm.expect(p.cliente).to.be.an(\u0027object\u0027);",
+                                                                                    "  pm.expect(p.producto).to.be.an(\u0027object\u0027);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Obtener pedido compuesto",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{pedidoUrl}}/api/pedidos/1"
+                                                  },
+                                      "description":  "200 OK: datos del pedido + cliente + producto en una sola respuesta.",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027200 OK\u0027, () =\u003e pm.response.to.have.status(200));",
+                                                                                    "const p = pm.response.json();",
+                                                                                    "pm.test(\u0027formato compuesto\u0027, () =\u003e {",
+                                                                                    "  pm.expect(p).to.have.property(\u0027id\u0027);",
+                                                                                    "  pm.expect(p).to.have.property(\u0027cantidad\u0027);",
+                                                                                    "  pm.expect(p.cliente).to.have.property(\u0027nombre\u0027);",
+                                                                                    "  pm.expect(p.producto).to.have.property(\u0027precio\u0027);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Atender pedido (PENDIENTE → ATENDIDO)",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{pedidoUrl}}/api/pedidos/1/atender"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Anular pedido (PENDIENTE → ANULADO)",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{pedidoUrl}}/api/pedidos/2/anular"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "409 · Pedido ya atendido no se anula",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{pedidoUrl}}/api/pedidos/1/anular"
+                                                  },
+                                      "description":  "409 Conflict: ATENDIDO y ANULADO son estados terminales."
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "05 · Casos de error",
+                     "item":  [
+                                  {
+                                      "name":  "400 · Categoría sin nombre ni estado",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"nombre\":\"\",\"estado\":\"\"}"
+                                                               },
+                                                      "url":  "{{categoriaUrl}}/api/categorias"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "404 · Categoría inexistente",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{categoriaUrl}}/api/categorias/999"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "404 · Producto con categoría inexistente",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"nombre\":\"Producto X\",\"precio\":10.00,\"stock\":1,\"categoriaId\":999}"
+                                                               },
+                                                      "url":  "{{productoUrl}}/api/productos"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "404 · Pedido con cliente inexistente",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"clienteId\":999,\"productoId\":9,\"cantidad\":1}"
+                                                               },
+                                                      "url":  "{{pedidoUrl}}/api/pedidos"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "404 · Pedido con producto inexistente",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"clienteId\":6,\"productoId\":999,\"cantidad\":1}"
+                                                               },
+                                                      "url":  "{{pedidoUrl}}/api/pedidos"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "400 · Pedido con cantidad 0",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"clienteId\":6,\"productoId\":9,\"cantidad\":0}"
+                                                               },
+                                                      "url":  "{{pedidoUrl}}/api/pedidos"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "400 · Pedido sin cantidad",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"clienteId\":6,\"productoId\":9}"
+                                                               },
+                                                      "url":  "{{pedidoUrl}}/api/pedidos"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "404 · Pedido inexistente",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{pedidoUrl}}/api/pedidos/999"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "503 · Servicio dependiente caído",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{pedidoUrl}}/api/pedidos/1",
+                                                      "description":  "Detenga producto-service (o cliente-service) y ejecute este request: 503 con JSON controlado, sin stack trace."
+                                                  }
+                                  }
+                              ]
+                 }
+             ]
 }

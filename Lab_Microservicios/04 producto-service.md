@@ -90,3 +90,45 @@ servicios:
 - [[03 categoria-service]]
 - [[06 pedido-service]]
 - [[12 Pruebas HTTP]]
+
+## S12 · producto-service con OpenFeign hacia categoría
+
+### Cambios
+
+- `pom.xml`: BOM de Spring Cloud 2025.1.4 + `spring-cloud-starter-netflix-eureka-client` + `spring-cloud-starter-openfeign`.
+- `ProductoServiceApplication`: `@EnableDiscoveryClient` y `@EnableFeignClients`.
+- Nuevo `dto/CategoriaDTO` (`id`, `nombre`, `estado`, `@JsonIgnoreProperties`).
+- `Producto`: nuevo campo `categoriaId` (columna `categoria_id`) y `@Transient CategoriaDTO categoria`.
+- Nuevo `client/CategoriaClient`:
+
+```java
+@FeignClient(name = "categoria-service")
+public interface CategoriaClient {
+    @GetMapping("/api/categorias/{id}")
+    CategoriaDTO obtenerCategoria(@PathVariable("id") Long id);
+}
+```
+
+- `ProductoService`:
+  - `guardar` y `actualizar` **validan la categoría antes de guardar** (corrige el bug de la guía).
+  - `obtener` completa la categoría.
+  - `listar` completa la categoría de cada producto y tolera fallos dejándola en `null`.
+- `ProductoDTO.precio`: `@DecimalMin("0.01")` para exigir precio **mayor a cero**.
+
+### Prueba real
+
+```text
+POST /api/productos  {"nombre":"Laptop","precio":2500,"stock":10,"categoriaId":9}
+201 {"categoria":{"id":9,"nombre":"Tecnología","estado":"ACTIVO"},"categoriaId":9,"id":9,...}
+
+GET /api/productos
+200 [ ... todos con "categoria" anidada ... ]
+```
+
+Errores verificados:
+
+- `categoriaId` inexistente → **404** `"Recurso no encontrado en el servicio remoto"` (y **no** se guarda el producto).
+- `categoria-service` caído → **503** JSON; el listado sigue en **200** con `categoria: null`.
+- `precio` 0 o negativo → **400**.
+
+Enlaces: [[19 OpenFeign]] · [[12 Pruebas HTTP]]

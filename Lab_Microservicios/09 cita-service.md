@@ -136,3 +136,15 @@ Si falta el diagnóstico → **400**. Si la cita ya tiene atención → **409**.
 - [[08 medico-service]]
 - [[12 Pruebas HTTP]]
 - [[15 Conclusiones]]
+
+## S12 · Registro en Eureka (opcional, completado)
+
+- Se agregó `spring-cloud-starter-netflix-eureka-client` + BOM 2025.1.4 y `@EnableDiscoveryClient`.
+- Se agregó la sección `eureka:` en `application-dev.yml` (`defaultZone: http://localhost:8761/eureka`).
+- No cambió el CRUD ni el puerto.
+- Verificado en `/eureka/apps`: aparece **UP** junto con los servicios base.
+
+> [!note] Alcance
+> La guía S12 marca este registro como opcional. Se hizo para cumplir el criterio "todos los servicios deben registrarse"; las llamadas de cita-service siguen usando URLs fijas de S11 (no era parte del alcance de OpenFeign de esta actividad).
+
+Enlaces: [[18 Eureka y service discovery]] · [[00 Índice (MOC)]]

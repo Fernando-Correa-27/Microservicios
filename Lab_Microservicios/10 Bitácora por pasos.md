@@ -431,3 +431,71 @@ docs: colecciones Postman de microservicios y clinica
 - [[12 Pruebas HTTP]]
 - [[14 Guía original y problemas detectados]]
 - [[15 Conclusiones]]
+
+## Bitácora GLAB-S12 (2026-11-05)
+
+> [!abstract] Resumen
+> S12 se construyó sobre el tag `s11-final`. Se mantuvo Boot 4.1.2/Java 25, se agregó Spring Cloud 2025.1.4, Eureka y OpenFeign, se refactorizó pedido y se probó todo contra servicios reales.
+
+### Paso 0 · Conservar S11
+
+```powershell
+git add -u
+git commit -m "chore: estado final de GLAB-S11 antes de iniciar GLAB-S12"
+git tag -a s11-final -m "Entrega final GLAB-S11"
+```
+
+### Paso 1 · Verificar entorno
+
+- MySQL 8.4 en 3306 estaba detenido; se inició con `mysqld --datadir=...` y se verificó `SELECT VERSION()` → `8.4.9`.
+- Se confirmó `JAVA_HOME` = JDK 25.
+
+### Paso 2 · Corregir eureka-server
+
+- El proyecto creado por Initializr tenía el paquete `com.tecsup.eureka_server` y no tenía `@EnableEurekaServer`.
+- Se movió a `com.tecsup`, se agregó `@EnableEurekaServer`, `application.yaml` con puerto 8761 y `register-with-eureka: false` / `fetch-registry: false`.
+- Verificación: `http://localhost:8761` → HTTP 200.
+
+### Paso 3 · Poms y clientes Eureka
+
+- Se agregó el BOM `spring-cloud-dependencies` 2025.1.4 y `spring-cloud-starter-netflix-eureka-client` a categoria, cliente, producto, pedido (y luego a paciente, médico, cita).
+- `@EnableDiscoveryClient` en las clases principales.
+- `eureka:` en los `application-dev.yml` con `defaultZone: http://localhost:8761/eureka`.
+- Se conservaron perfiles dev/prod y `empresa.ambiente`.
+
+### Paso 4 · OpenFeign en producto
+
+- `spring-cloud-starter-openfeign` + `@EnableFeignClients`.
+- `CategoriaDTO`, `categoriaId` + `@Transient categoria` en `Producto`, `CategoriaClient`.
+- Validación de categoría **antes** de guardar; listado tolerante.
+- Prueba real con `categoriaId=9` → 201 con categoría anidada.
+
+### Paso 5 · Refactor de pedido
+
+- Se eliminaron `DetallePedido` y `DetallePedidoDTO`.
+- Nuevo `Pedido` con `clienteId`, `productoId`, `cantidad`, `estado`.
+- Se eliminaron las tablas `pedido` y `detalle_pedido` de `bd_pedido_dev`; Hibernate recreó `pedido`.
+- `ClienteClient`, `ProductoClient`, `ClienteDTO`, `ProductoDTO`, `PedidoResponseDTO`.
+- Endpoints `PUT /{id}/anular` y `PUT /{id}/atender`; sin DELETE.
+- `ConflictException` + handler 409.
+
+### Paso 6 · Arranque y verificación Eureka
+
+- `run\start-all.ps1` actualizado: Eureka primero, espera 8761, luego servicios en orden.
+- `/eureka/apps` mostró los 7 servicios **UP**.
+- Se detectó un 503 inicial por caché de registro vacía en pedido; se corrigió con arranque secuencial, `disable-delta: true` y `registry-fetch-interval-seconds: 5`.
+
+### Paso 7 · Pruebas
+
+- Flujo éxito: cliente 6 → producto 9 → pedido 1 → `GET /api/pedidos/1` con cliente y producto.
+- Errores: 400 (cantidad, DNI, precio), 404 (cliente/producto/pedido), 409 (transiciones), 503 (servicio caído).
+- Regresión S11: `run\smoke-test.ps1` → **47/47 correctas**.
+
+### Paso 8 · Postman y bitácora
+
+- Nueva colección `postman/GLAB-S12-Microservicios.postman_collection.json`.
+- Colección S11 actualizada al contrato de pedido de S12.
+- Cuerpos JSON nuevos en `postman/bodies/`.
+- Este vault actualizado.
+
+Enlaces: [[17 Decisión de versiones Boot 4 + Spring Cloud 2025.1.x]] · [[18 Eureka y service discovery]] · [[19 OpenFeign]] · [[12 Pruebas HTTP]]

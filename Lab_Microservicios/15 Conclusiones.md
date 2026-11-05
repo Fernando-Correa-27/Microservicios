@@ -147,3 +147,18 @@ updated: 2026-11-01
 > > "Los microservicios no son gratis: exigen contratos, observabilidad, resiliencia y automatización. Este laboratorio demostró que **empezar bien** (DTOs, excepciones, config externa, tests reales) ahorra semanas de debugging después."
 >
 > — Entregado: **2026-11-01** — Vault: `C:\Users\lenovo\Downloads\microservicios\Lab_Microservicios`
+
+## Conclusiones GLAB-S12
+
+1. **El descubrimiento de servicios elimina el acoplamiento por URL.** Antes, producto y pedido conocían hosts y puertos ajenos; ahora solo conocen un nombre lógico y Eureka resuelve la instancia viva. Eso permite mover o replicar servicios sin recompilar a los consumidores.
+
+2. **OpenFeign hace explícito el contrato remoto.** Una interfaz con `@FeignClient` documenta qué endpoint se consume, con qué método y qué DTO de respuesta. Es más legible y menos propenso a errores que construir URLs con `RestClient`, y se integra de forma natural con Eureka y LoadBalancer.
+
+3. **Validar antes de guardar es una regla de consistencia, no un detalle.** El orden “consultar la referencia remota y luego persistir” evita datos huérfanos cuando la categoría, el cliente o el producto no existen. La guía lo hacía al revés y el fallo era silencioso hasta consultar la BD.
+
+4. **Los errores de integración necesitan respuestas controladas.** Distinguir 404 (referencia inexistente), 409 (transición inválida), 503 (dependencia caída) y 500 (error inesperado) permitió que el cliente sepa si el problema es suyo, del estado del pedido o de la infraestructura. Un listado tolerante a fallos mantiene la disponibilidad parcial.
+
+5. **El modelo correcto para pedido es el de identificadores + estado.** Guardar solo `clienteId`, `productoId`, `cantidad` y `estado` respeta la autonomía de cada microservicio (sin FK ni relaciones JPA cruzadas) y hace que el pedido sea un agregado pequeño, consistente y fácil de evolucionar; anular/atender reemplaza al DELETE y conserva la trazabilidad.
+
+Enlaces: [[17 Decisión de versiones Boot 4 + Spring Cloud 2025.1.x]] · [[20 Comunicación entre servicios (flujo GET pedido)]]
+

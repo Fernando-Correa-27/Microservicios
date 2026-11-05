@@ -151,3 +151,63 @@ Con `orphanRemoval = true`, Hibernate elimina los anteriores e inserta los nuevo
 - [[04 producto-service]]
 - [[12 Pruebas HTTP]]
 - [[14 Guía original y problemas detectados]]
+
+## S12 · pedido-service refactorizado (IDs + estado + OpenFeign)
+
+> [!important] Cambio de modelo
+> El pedido de S11 guardaba `fecha`, `total` y una lista de `DetallePedido`. En S12 guarda **solo** `clienteId`, `productoId`, `cantidad` y `estado`. Se eliminaron `DetallePedido` y `DetallePedidoDTO`, y se recreó la tabla `pedido` en `bd_pedido_dev` (se eliminó `detalle_pedido`).
+
+### Entidad
+
+```java
+@Entity
+@Table(name = "pedido")
+public class Pedido {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_pedido") private Long idPedido;
+    @Column(name = "cliente_id", nullable = false)  private Long clienteId;
+    @Column(name = "producto_id", nullable = false) private Long productoId;
+    @Column(nullable = false) private Integer cantidad;
+    @Column(nullable = false, length = 20) private String estado = PENDIENTE;
+}
+```
+
+Sin `@ManyToOne` ni relaciones JPA cruzadas.
+
+### Endpoints
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/pedidos` | Listado con cliente/producto (tolera fallos) |
+| GET | `/api/pedidos/{id}` | Pedido + cliente + producto |
+| POST | `/api/pedidos` | Crea en estado PENDIENTE (201) |
+| PUT | `/api/pedidos/{id}/anular` | PENDIENTE → ANULADO |
+| PUT | `/api/pedidos/{id}/atender` | PENDIENTE → ATENDIDO |
+
+> [!warning] Sin DELETE
+> `DELETE /api/pedidos/{id}` fue eliminado. Un pedido se anula; no se borra.
+
+### OpenFeign
+
+- `ClienteClient` (`@FeignClient(name="cliente-service")`) → `GET /api/clientes/{id}`.
+- `ProductoClient` (`@FeignClient(name="producto-service")`) → `GET /api/productos/{id}`.
+- `ClienteDTO` (`id`, `nombre`, `apellido` con `@JsonAlias("apellidos")`).
+- `ProductoDTO` (`id`, `nombre`, `precio`, tolerante a `categoria`).
+- `PedidoResponseDTO` (`id`, `cantidad`, `estado`, `cliente`, `producto`).
+
+### Validación y errores
+
+- `clienteId` y `productoId` obligatorios; `cantidad` mayor a cero (`@Valid` + `@NotNull`/`@Min`).
+- Cliente/producto inexistente → **404** con mensaje específico.
+- Transición inválida → **409** (`ConflictException`).
+- Servicio caído → **503**; error genérico → **500**.
+- Listado con servicio caído → **200** con el dato remoto en `null`.
+
+### Respuesta real
+
+```json
+{"cantidad":2,"cliente":{"apellido":"Ramirez","id":6,"nombre":"Carlos"},
+ "estado":"PENDIENTE","id":1,"producto":{"id":9,"nombre":"Laptop","precio":2500.00}}
+```
+
+Enlaces: [[20 Comunicación entre servicios (flujo GET pedido)]] · [[19 OpenFeign]] · [[12 Pruebas HTTP]]

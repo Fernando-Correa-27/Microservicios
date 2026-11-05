@@ -1,0 +1,379 @@
+{
+  "info": {
+    "_postman_id": "c1a2c3d4-0012-4a12-9e12-000000000012",
+    "name": "GLAB-S12 · Comunicación entre Servicios (Eureka + OpenFeign)",
+    "description": "Colección del laboratorio GLAB-S12. Orden sugerido: Eureka → categorías → productos → clientes → pedidos → errores. Los servicios deben estar registrados en Eureka (http://localhost:8761).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "eurekaUrl", "value": "http://localhost:8761" },
+    { "key": "categoriaUrl", "value": "http://localhost:8082" },
+    { "key": "productoUrl", "value": "http://localhost:8083" },
+    { "key": "clienteUrl", "value": "http://localhost:8081" },
+    { "key": "pedidoUrl", "value": "http://localhost:8084" }
+  ],
+  "item": [
+    {
+      "name": "00 · Eureka (service discovery)",
+      "item": [
+        {
+          "name": "Dashboard Eureka",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{eurekaUrl}}/",
+            "description": "200 OK con el dashboard HTML. Debe mostrar los servicios en estado UP."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aplicaciones registradas (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{eurekaUrl}}/eureka/apps",
+            "description": "Debe listar CATEGORIA-SERVICE, CLIENTE-SERVICE, PRODUCTO-SERVICE, PEDIDO-SERVICE y, si están levantados, PACIENTE-SERVICE, MEDICO-SERVICE y CITA-SERVICE."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const apps = pm.response.json().applications.application || [];",
+                  "const nombres = apps.map(a => a.name);",
+                  "pm.test('incluye los 4 servicios base', () => {",
+                  "  ['CATEGORIA-SERVICE','CLIENTE-SERVICE','PRODUCTO-SERVICE','PEDIDO-SERVICE'].forEach(n => pm.expect(nombres).to.include(n));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aplicaciones registradas (XML)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/xml" }],
+            "url": "{{eurekaUrl}}/eureka/apps"
+          }
+        },
+        {
+          "name": "Instancias de PEDIDO-SERVICE",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{eurekaUrl}}/eureka/apps/PEDIDO-SERVICE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 · Categorías",
+      "item": [
+        {
+          "name": "Listar categorías",
+          "request": { "method": "GET", "header": [], "url": "{{categoriaUrl}}/api/categorias" }
+        },
+        {
+          "name": "Obtener categoría por ID",
+          "request": { "method": "GET", "header": [], "url": "{{categoriaUrl}}/api/categorias/9" }
+        },
+        {
+          "name": "Crear categoría con tilde (UTF-8)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Tecnología\",\"estado\":\"ACTIVO\"}"
+            },
+            "url": "{{categoriaUrl}}/api/categorias",
+            "description": "201 Created. Verifica que el nombre con tilde se guarde y devuelva correctamente (utf8mb4)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('conserva la tilde', () => pm.expect(pm.response.json().nombre).to.include('Tecnología'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 · Productos (OpenFeign → categoria-service)",
+      "item": [
+        {
+          "name": "Listar productos (categoría anidada)",
+          "request": { "method": "GET", "header": [], "url": "{{productoUrl}}/api/productos" },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('el primer producto trae categoria', () => {",
+                  "  pm.expect(lista.length).to.be.above(0);",
+                  "  pm.expect(lista[0]).to.have.property('categoria');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener producto por ID",
+          "request": { "method": "GET", "header": [], "url": "{{productoUrl}}/api/productos/9" }
+        },
+        {
+          "name": "Crear producto (valida categoría por Feign)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Laptop\",\"precio\":2500,\"stock\":10,\"categoriaId\":9}"
+            },
+            "url": "{{productoUrl}}/api/productos",
+            "description": "201 Created con la categoría anidada. Si categoriaId no existe: 404. Si categoria-service está caído: 503."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('incluye categoria anidada', () => pm.expect(pm.response.json().categoria).to.be.an('object'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "404 · Producto con categoría inexistente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"nombre\":\"Producto X\",\"precio\":10.00,\"stock\":1,\"categoriaId\":999}" },
+            "url": "{{productoUrl}}/api/productos",
+            "description": "404: la categoría se valida ANTES de guardar, por lo que no queda un producto huérfano."
+          }
+        },
+        {
+          "name": "400 · Producto con precio 0",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"nombre\":\"Producto X\",\"precio\":0,\"stock\":1,\"categoriaId\":9}" },
+            "url": "{{productoUrl}}/api/productos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 · Clientes",
+      "item": [
+        {
+          "name": "Listar clientes",
+          "request": { "method": "GET", "header": [], "url": "{{clienteUrl}}/api/clientes" }
+        },
+        {
+          "name": "Obtener cliente por ID",
+          "request": { "method": "GET", "header": [], "url": "{{clienteUrl}}/api/clientes/6" }
+        },
+        {
+          "name": "Crear cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Carlos\",\"apellidos\":\"Ramirez\",\"direccion\":\"Av. Lima 123\",\"telefono\":\"987654321\",\"nroDni\":\"45678912\",\"estado\":\"ACTIVO\"}"
+            },
+            "url": "{{clienteUrl}}/api/clientes",
+            "description": "201 Created. DNI duplicado: 409."
+          }
+        },
+        {
+          "name": "400 · DNI con 7 dígitos",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Ana\",\"apellidos\":\"Lopez\",\"direccion\":\"Calle 1\",\"telefono\":\"987654321\",\"nroDni\":\"1234567\",\"estado\":\"ACTIVO\"}"
+            },
+            "url": "{{clienteUrl}}/api/clientes"
+          }
+        },
+        {
+          "name": "400 · DNI con letras",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Ana\",\"apellidos\":\"Lopez\",\"direccion\":\"Calle 1\",\"telefono\":\"987654321\",\"nroDni\":\"1234567A\",\"estado\":\"ACTIVO\"}"
+            },
+            "url": "{{clienteUrl}}/api/clientes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 · Pedidos (OpenFeign → cliente-service y producto-service)",
+      "item": [
+        {
+          "name": "Listar pedidos (tolerante a fallos remotos)",
+          "request": { "method": "GET", "header": [], "url": "{{pedidoUrl}}/api/pedidos" },
+          "description": "Si un servicio remoto está caído, el pedido se devuelve con cliente/producto en null sin romper el listado."
+        },
+        {
+          "name": "Crear pedido",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json; charset=utf-8" }],
+            "body": { "mode": "raw", "raw": "{\"clienteId\":6,\"productoId\":9,\"cantidad\":2}" },
+            "url": "{{pedidoUrl}}/api/pedidos",
+            "description": "201 Created. Valida cliente y producto por Feign antes de guardar; estado inicial PENDIENTE."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const p = pm.response.json();",
+                  "pm.test('estado PENDIENTE', () => pm.expect(p.estado).to.eql('PENDIENTE'));",
+                  "pm.test('cliente y producto anidados', () => {",
+                  "  pm.expect(p.cliente).to.be.an('object');",
+                  "  pm.expect(p.producto).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener pedido compuesto",
+          "request": { "method": "GET", "header": [], "url": "{{pedidoUrl}}/api/pedidos/1" },
+          "description": "200 OK: datos del pedido + cliente + producto en una sola respuesta.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json();",
+                  "pm.test('formato compuesto', () => {",
+                  "  pm.expect(p).to.have.property('id');",
+                  "  pm.expect(p).to.have.property('cantidad');",
+                  "  pm.expect(p.cliente).to.have.property('nombre');",
+                  "  pm.expect(p.producto).to.have.property('precio');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Atender pedido (PENDIENTE → ATENDIDO)",
+          "request": { "method": "PUT", "header": [], "url": "{{pedidoUrl}}/api/pedidos/1/atender" }
+        },
+        {
+          "name": "Anular pedido (PENDIENTE → ANULADO)",
+          "request": { "method": "PUT", "header": [], "url": "{{pedidoUrl}}/api/pedidos/2/anular" }
+        },
+        {
+          "name": "409 · Pedido ya atendido no se anula",
+          "request": { "method": "PUT", "header": [], "url": "{{pedidoUrl}}/api/pedidos/1/anular" },
+          "description": "409 Conflict: ATENDIDO y ANULADO son estados terminales."
+        }
+      ]
+    },
+    {
+      "name": "05 · Casos de error S12",
+      "item": [
+        {
+          "name": "404 · Pedido con cliente inexistente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"clienteId\":999,\"productoId\":9,\"cantidad\":1}" },
+            "url": "{{pedidoUrl}}/api/pedidos"
+          }
+        },
+        {
+          "name": "404 · Pedido con producto inexistente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"clienteId\":6,\"productoId\":999,\"cantidad\":1}" },
+            "url": "{{pedidoUrl}}/api/pedidos"
+          }
+        },
+        {
+          "name": "400 · Pedido con cantidad 0",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"clienteId\":6,\"productoId\":9,\"cantidad\":0}" },
+            "url": "{{pedidoUrl}}/api/pedidos"
+          }
+        },
+        {
+          "name": "400 · Pedido sin cantidad",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"clienteId\":6,\"productoId\":9}" },
+            "url": "{{pedidoUrl}}/api/pedidos"
+          }
+        },
+        {
+          "name": "404 · Pedido inexistente",
+          "request": { "method": "GET", "header": [], "url": "{{pedidoUrl}}/api/pedidos/999" }
+        },
+        {
+          "name": "503 · Servicio dependiente caído",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{pedidoUrl}}/api/pedidos/1",
+            "description": "Detenga producto-service (o cliente-service) y ejecute este request: 503 con JSON controlado, sin stack trace."
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 · Servicios de citas (registrados en Eureka)",
+      "item": [
+        { "name": "Listar pacientes", "request": { "method": "GET", "header": [], "url": "http://localhost:8085/api/pacientes" } },
+        { "name": "Listar médicos", "request": { "method": "GET", "header": [], "url": "http://localhost:8086/api/medicos" } },
+        { "name": "Listar citas", "request": { "method": "GET", "header": [], "url": "http://localhost:8087/api/citas" } }
+      ]
+    }
+  ]
+}

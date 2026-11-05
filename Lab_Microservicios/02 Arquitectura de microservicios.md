@@ -135,3 +135,65 @@ flowchart TD
 - [[08 medico-service]]
 - [[09 cita-service]]
 - [[13 Conceptos clave]]
+
+## S12 · Arquitectura con Eureka y OpenFeign
+
+> [!info] Diagrama actualizado
+> El diagrama anterior mostraba llamadas HTTP directas. Desde S12 los servicios se descubren por **Eureka** y las llamadas se hacen por **OpenFeign** usando el nombre lógico.
+
+```mermaid
+flowchart LR
+    subgraph Descubrimiento["Service discovery"]
+        EU["eureka-server<br/>:8761"]
+    end
+
+    subgraph Catalogo["Catálogo y ventas"]
+        CLI["cliente-service<br/>:8081"]
+        CAT["categoria-service<br/>:8082"]
+        PRO["producto-service<br/>:8083"]
+        PED["pedido-service<br/>:8084"]
+    end
+
+    subgraph Clinica["Clínica Salud Integral"]
+        PAC["paciente-service<br/>:8085"]
+        MED["medico-service<br/>:8086"]
+        CIT["cita-service<br/>:8087"]
+    end
+
+    DBC[("bd_cliente_dev")]
+    DBCA[("bd_categoria_dev")]
+    DBP[("bd_producto_dev")]
+    DBPE[("bd_pedido_dev")]
+    DBPA[("bd_paciente_dev")]
+    DBM[("bd_medico_dev")]
+    DBCI[("bd_cita_dev")]
+
+    CLI --> DBC
+    CAT --> DBCA
+    PRO --> DBP
+    PED --> DBPE
+    PAC --> DBPA
+    MED --> DBM
+    CIT --> DBCI
+
+    CLI -.->|registra| EU
+    CAT -.->|registra| EU
+    PRO -.->|registra| EU
+    PED -.->|registra| EU
+    PAC -.->|registra| EU
+    MED -.->|registra| EU
+    CIT -.->|registra| EU
+
+    PRO -- "Feign: categoria-service" --> CAT
+    PED -- "Feign: cliente-service" --> CLI
+    PED -- "Feign: producto-service" --> PRO
+    CIT -- "HTTP: paciente-service" --> PAC
+    CIT -- "HTTP: medico-service" --> MED
+```
+
+> [!important] Reglas que no cambian
+> - Sin relaciones JPA entre microservicios.
+> - Sin compartir bases ni consultar la BD de otro servicio.
+> - Comunicación solo por REST (OpenFeign en producto y pedido).
+
+Enlaces: [[18 Eureka y service discovery]] · [[19 OpenFeign]] · [[20 Comunicación entre servicios (flujo GET pedido)]]

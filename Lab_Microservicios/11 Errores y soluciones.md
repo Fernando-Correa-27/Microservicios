@@ -237,7 +237,7 @@ Tomcat initialized with port 9092 (http)
 
 ## 10 · Carpeta `categoría-service` con acento
 
-**Error:** rutas y salida de consola con `categor�a`, problemas de codificación.
+**Error:** rutas y salida de consola con `categoría`, problemas de codificación.
 
 **Causa:** el nombre de carpeta incluía `í`.
 
@@ -279,3 +279,24 @@ Tomcat initialized with port 9092 (http)
 - [[10 Bitácora por pasos]]
 - [[12 Pruebas HTTP]]
 - [[14 Guía original y problemas detectados]]
+
+## Errores y soluciones de GLAB-S12
+
+| Error observado | Causa | Solución aplicada |
+|---|---|---|
+| `CompatibilityNotMetException` al arrancar | Spring Cloud 2025.0.x no es compatible con Boot 4.1.2 | Se usó Spring Cloud **2025.1.4** en los 8 proyectos |
+| `503` en el primer `POST /api/pedidos` | `pedido-service` arrancó con el registro de Eureka vacío (todos los servicios a la vez) | Arranque secuencial con espera + `disable-delta: true` + `registry-fetch-interval-seconds: 5` |
+| `Failed to execute repackage ... Unable to rename ...jar` | El jar estaba en uso por un proceso Java | Detener servicios (`run\stop-all.ps1`) antes de `mvn package` |
+| `"Tecnología"` en consola | Codificación de la consola de Windows, no del servicio | Enviar con `curl.exe --data-binary @archivo.json` (UTF-8 sin BOM); verificar con `[System.IO.File]::ReadAllText(..., UTF8)` |
+| Producto huérfano si la categoría no existe | La guía guardaba antes de validar | Validar por Feign **antes** de `save()` en producto y pedido |
+| `500` genérico al fallar Feign | No había handlers específicos | `FeignException.NotFound` → 404; `FeignException` → 503; `Exception` → 500 |
+| `apellido` vs `apellidos` | La guía mezcla ambos nombres | `apellidos` en cliente-service; `@JsonAlias("apellidos")` en `ClienteDTO` del pedido |
+| `No instances available for ...` | Servicio caído o aún no registrado | Se espera el registro; si está caído se devuelve 503 controlado |
+| `GET /api/pedidos` rompía todo si un remoto fallaba | Listado sin tolerancia | `try/catch` por pedido y campo remoto en `null` |
+| `MySQL ... (10061)` | MySQL detenido | Iniciar `mysqld` en 3306 antes de probar |
+| Acentos corruptos en columnas | Charset heredado de S11 | `ALTER DATABASE/TABLE ... utf8mb4` y conexión con `characterEncoding=UTF-8` |
+
+> [!tip] Lección
+> Los errores de S12 fueron mayormente de **integración** (registro, orden de arranque, codificación), no de lógica de negocio. Probar contra servicios reales fue lo que los hizo visibles.
+
+Enlaces: [[18 Eureka y service discovery]] · [[19 OpenFeign]] · [[14 Guía original y problemas detectados]]

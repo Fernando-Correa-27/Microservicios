@@ -68,3 +68,25 @@ El handler traduce `DuplicateResourceException` a **409 Conflict**. En actualiza
 
 - [[06 pedido-service]] (consumidor)
 - [[12 Pruebas HTTP]]
+
+## S12 · cliente-service como cliente de Eureka
+
+- Se agregó `spring-cloud-starter-netflix-eureka-client` y `@EnableDiscoveryClient`.
+- Se agregó la sección `eureka:` en `application-dev.yml`.
+- **No cambió** el CRUD ni el puerto 8081.
+- Es consumido por `pedido-service` mediante `ClienteClient` (Feign, nombre lógico `cliente-service`).
+
+### Criterio de nombres
+
+| Campo | Nombre en cliente-service | Nombre en la respuesta del pedido |
+|---|---|---|
+| Apellidos | `apellidos` | `apellido` (mapeado con `@JsonAlias("apellidos")`) |
+| DNI | `nroDni` | no se expone en el pedido |
+| Estado | `estado` | no se expone en el pedido |
+
+> [!note] Por qué el alias
+> La guía mezcla `"apellido"` (JSON del pedido) con `"apellidos"` (validaciones de cliente). Se mantuvo `apellidos` como contrato de cliente-service y se agregó un alias en el `ClienteDTO` del pedido para que la salida coincida con el ejemplo.
+
+Validaciones vigentes: nombre, apellidos, dirección, teléfono, estado y `nroDni` obligatorios; DNI exactamente 8 dígitos (`@Pattern("\\d{8}")`). DNI duplicado → **409**.
+
+Enlaces: [[19 OpenFeign]] · [[12 Pruebas HTTP]]

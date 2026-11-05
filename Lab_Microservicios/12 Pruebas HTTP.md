@@ -147,3 +147,63 @@ Archivo generado: `run/smoke-results.json` (JSON con detalle de cada prueba: sta
 | **TOTAL** | **42** | **42/42** |
 
 > [!check] **Todas las pruebas pasan** — laboratorio validado end-to-end.
+
+## Pruebas GLAB-S12 (servicios reales)
+
+> [!info] Entorno
+> MySQL 8.4 en 3306, Eureka en 8761, servicios en 8081–8087. Pruebas con `curl.exe` y `run\smoke-test.ps1`. Los cuerpos se enviaron como UTF-8 sin BOM con `--data-binary @archivo.json`.
+
+### Flujo de éxito
+
+| # | Request | Esperado | Obtenido | Evidencia |
+|---|---|---|---|---|
+| 1 | `POST /api/categorias` `{"nombre":"Tecnología","estado":"ACTIVO"}` | 201 | **201** | id 9, tilde correcta |
+| 2 | `POST /api/clientes` (Carlos, DNI 45678912) | 201 | **201** | id 6 |
+| 3 | `POST /api/productos` `categoriaId=9` | 201 | **201** | `categoria` anidada |
+| 4 | `GET /api/productos` | 200 | **200** | todos con `categoria` |
+| 5 | `POST /api/pedidos` `{"clienteId":6,"productoId":9,"cantidad":2}` | 201 | **201** | id 1, PENDIENTE |
+| 6 | `GET /api/pedidos/1` | 200 | **200** | pedido + cliente + producto |
+| 7 | `PUT /api/pedidos/1/atender` | 200 | **200** | ATENDIDO |
+| 8 | `PUT /api/pedidos/2/anular` | 200 | **200** | ANULADO |
+
+### Errores y validaciones
+
+| # | Request | Esperado | Obtenido |
+|---|---|---|---|
+| 9 | `POST /api/pedidos` clienteId 999 | 404 | **404** |
+| 10 | `POST /api/pedidos` productoId 999 | 404 | **404** |
+| 11 | `POST /api/pedidos` cantidad 0 | 400 | **400** |
+| 12 | `POST /api/pedidos` sin cantidad | 400 | **400** |
+| 13 | `GET /api/pedidos/999` | 404 | **404** |
+| 14 | `PUT /api/pedidos/999/anular` | 404 | **404** |
+| 15 | `PUT /api/pedidos/1/anular` (ya ATENDIDO) | 409 | **409** |
+| 16 | `PUT /api/pedidos/2/atender` (ya ANULADO) | 409 | **409** |
+| 17 | `POST /api/productos` precio 0 | 400 | **400** |
+| 18 | `POST /api/productos` precio -5 | 400 | **400** |
+| 19 | `POST /api/productos` nombre vacío | 400 | **400** |
+| 20 | `POST /api/productos` categoriaId 777 | 404 | **404** |
+| 21 | `POST /api/clientes` DNI 1234567 (7 dígitos) | 400 | **400** |
+| 22 | `POST /api/clientes` DNI 1234567A (letras) | 400 | **400** |
+
+### Servicio caído (prueba destructiva controlada)
+
+| # | Acción | Esperado | Obtenido |
+|---|---|---|---|
+| 23 | Detener `producto-service` y `GET /api/pedidos/1` | 503 | **503** JSON controlado |
+| 24 | Detener `producto-service` y `GET /api/pedidos` | 200 con `producto:null` | **200** con `producto:null` |
+| 25 | Detener `producto-service` y `POST /api/pedidos` | 503 | **503** |
+| 26 | Detener `categoria-service` y `GET /api/productos` | 200 con `categoria:null` | **200** con `categoria:null` |
+| 27 | Detener `categoria-service` y `GET /api/productos/1` | 503 | **503** |
+| 28 | Detener `categoria-service` y `POST /api/productos` | 503 | **503** |
+
+### Regresión S11
+
+```text
+run\smoke-test.ps1
+Total: 47  Correctas: 47  Fallas: 0
+```
+
+Incluye cliente, categoría, producto, pedido (contrato S12), paciente, médico, cita y transiciones de estado.
+
+Enlaces: [[20 Comunicación entre servicios (flujo GET pedido)]] · [[11 Errores y soluciones]]
+

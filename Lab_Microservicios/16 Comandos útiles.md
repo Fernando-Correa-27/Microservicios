@@ -256,3 +256,65 @@ $env:SPRING_PROFILES_ACTIVE = "prod"
 ---
 
 > [!check] **Todos los comandos probados en Windows 11 + PowerShell 5.1** — ajustar rutas si tu instalación difiere.
+
+## Comandos GLAB-S12
+
+### Arranque (Eureka primero)
+
+```powershell
+# Compila todo y levanta Eureka + 7 servicios en orden
+powershell -ExecutionPolicy Bypass -File run\start-all.ps1
+
+# Solo los 4 servicios base (sin clínica)
+powershell -ExecutionPolicy Bypass -File run\start-all.ps1 -CoreOnly
+
+# Sin recompilar (jars ya construidos)
+powershell -ExecutionPolicy Bypass -File run\start-all.ps1 -SkipBuild
+
+# Detener todo
+powershell -ExecutionPolicy Bypass -File run\stop-all.ps1
+```
+
+> [!warning] Antes de compilar
+> Detén los servicios: en Windows el jar en ejecución bloquea el `repackage` de Maven.
+
+### Eureka
+
+```powershell
+Invoke-WebRequest http://localhost:8761/ -UseBasicParsing
+Invoke-WebRequest http://localhost:8761/eureka/apps -Headers @{Accept='application/json'} -UseBasicParsing
+Invoke-WebRequest http://localhost:8761/eureka/apps/PEDIDO-SERVICE -Headers @{Accept='application/json'} -UseBasicParsing
+```
+
+### OpenFeign / flujo
+
+```powershell
+curl.exe -s http://localhost:8083/api/productos
+curl.exe -s http://localhost:8084/api/pedidos/1
+curl.exe -s -X PUT http://localhost:8084/api/pedidos/1/atender
+curl.exe -s -X PUT http://localhost:8084/api/pedidos/1/anular
+```
+
+### Enviar JSON con tildes (UTF-8 sin BOM)
+
+```powershell
+$dir = "$env:TEMP\s12"
+[System.IO.File]::WriteAllText("$dir\cat.json", '{"nombre":"Tecnología","estado":"ACTIVO"}', (New-Object System.Text.UTF8Encoding($false)))
+curl.exe -s -X POST http://localhost:8082/api/categorias -H "Content-Type: application/json; charset=utf-8" --data-binary "@$dir\cat.json"
+```
+
+### MySQL
+
+```powershell
+& 'C:\Program Files\MySQL\MySQL Server 8.4\bin\mysql.exe' -u root -e "SELECT VERSION();"
+& 'C:\Program Files\MySQL\MySQL Server 8.4\bin\mysql.exe' -u root -e "SELECT table_schema,table_name,table_collation FROM information_schema.tables WHERE table_schema LIKE 'bd_%_dev';"
+```
+
+### Regresión
+
+```powershell
+powershell -ExecutionPolicy Bypass -File run\smoke-test.ps1
+```
+
+Enlaces: [[18 Eureka y service discovery]] · [[12 Pruebas HTTP]]
+

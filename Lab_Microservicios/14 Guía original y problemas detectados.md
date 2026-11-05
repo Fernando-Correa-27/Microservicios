@@ -351,3 +351,24 @@ public ResponseEntity<Cita> cancelar(@PathVariable Integer id) {
 ---
 
 > [!check] **Todos los defectos de la guía identificados y corregidos** — el laboratorio cumple requisitos funcionales y no funcionales exigidos.
+
+## Inconsistencias y trampas de la guía S12
+
+| # | Problema en la guía | Corrección aplicada |
+|---|---|---|
+| 1 | Postman usa `/api/categorías` (con tilde); Feign usa `/api/categorias` | Ruta **sin tilde** en código, pruebas y colección |
+| 2 | `ProductoService.guardar` guarda y luego consulta la categoría | Validar por Feign **antes** de guardar |
+| 3 | `listar()` de producto no completa la categoría | Se completa; si falla, `categoria: null` sin romper el listado |
+| 4 | No hay handlers específicos de Feign | `FeignException.NotFound` → 404; `FeignException` → 503; `Exception` → 500 |
+| 5 | `apellido` en el JSON del pedido, `apellidos` en cliente, `nro_dni` en la guía | `apellidos` + `nroDni` en cliente; alias `apellidos` → `apellido` en `ClienteDTO` |
+| 6 | Pedido de S11 con `fecha`, `total` y detalles | Refactor a `clienteId`, `productoId`, `cantidad`, `estado` |
+| 7 | La guía no define transiciones terminales con claridad | `PENDIENTE → ATENDIDO/ANULADO`; ATENDIDO/ANULADO → 409 |
+| 8 | Poms de Boot 3.5 + Cloud 2025.0.0 | Boot 4.1.2 + Cloud 2025.1.4; starters de Boot 4 |
+| 9 | Se asume propagación inmediata de Eureka | Arranque secuencial + `disable-delta` + fetch de 5 s |
+| 10 | No se prueba UTF-8 de punta a punta | MySQL utf8mb4 + `--data-binary @file.json` + verificación con "Tecnología" |
+
+> [!note] Sobre el paso 3 de la guía
+> Importar el módulo `eureka-server` en IntelliJ se omitió por indicación del usuario; se hará manualmente.
+
+Enlaces: [[17 Decisión de versiones Boot 4 + Spring Cloud 2025.1.x]] · [[11 Errores y soluciones]]
+
