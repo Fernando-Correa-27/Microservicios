@@ -36,6 +36,11 @@ public class GlobalExceptionHandler {
         return respuesta(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<Map<String, Object>> manejarConflictoEstado(ConflictException ex) {
+        return respuesta(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(ServiceUnavailableException.class)
     public ResponseEntity<Map<String, Object>> manejarServicioCaido(ServiceUnavailableException ex) {
         return respuesta(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
@@ -59,6 +64,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> manejarParametroInvalido(MethodArgumentTypeMismatchException ex) {
         return respuesta(HttpStatus.BAD_REQUEST, "Parámetro inválido: " + ex.getName());
+    }
+
+    /**
+     * GLAB-S12: el servicio remoto respondió 404.
+     */
+    @ExceptionHandler(feign.FeignException.NotFound.class)
+    public ResponseEntity<Map<String, Object>> manejarFeignNoEncontrado(feign.FeignException.NotFound ex) {
+        return respuesta(HttpStatus.NOT_FOUND, "Recurso no encontrado en el servicio remoto");
+    }
+
+    /**
+     * GLAB-S12: dependencia caída, sin instancia en Eureka, timeout o error remoto.
+     */
+    @ExceptionHandler(feign.FeignException.class)
+    public ResponseEntity<Map<String, Object>> manejarFeignError(feign.FeignException ex) {
+        return respuesta(HttpStatus.SERVICE_UNAVAILABLE,
+                "Un servicio dependiente no está disponible o respondió con error");
     }
 
     @ExceptionHandler(Exception.class)

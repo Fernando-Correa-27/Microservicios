@@ -1,49 +1,43 @@
 package com.tecsup.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PedidoDTO {
 
-    @NotNull(message = "La fecha es obligatoria")
-    private LocalDate fecha;
+    @NotNull(message = "El clienteId es obligatorio")
+    private Long clienteId;
 
-    @NotNull(message = "El cliente es obligatorio")
-    private Long idCliente;
+    @NotNull(message = "El productoId es obligatorio")
+    private Long productoId;
 
-    @NotEmpty(message = "El pedido debe tener al menos un detalle")
-    @Size(max = 50, message = "El pedido no puede tener más de 50 detalles")
-    @Valid
-    private List<DetallePedidoDTO> detalles;
+    @NotNull(message = "La cantidad es obligatoria")
+    @Min(value = 1, message = "La cantidad debe ser mayor a cero")
+    private Integer cantidad;
 
-    public LocalDate getFecha() {
-        return fecha;
+    public Long getClienteId() {
+        return clienteId;
     }
 
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
+    public void setClienteId(Long clienteId) {
+        this.clienteId = clienteId;
     }
 
-    public Long getIdCliente() {
-        return idCliente;
+    public Long getProductoId() {
+        return productoId;
     }
 
-    public void setIdCliente(Long idCliente) {
-        this.idCliente = idCliente;
+    public void setProductoId(Long productoId) {
+        this.productoId = productoId;
     }
 
-    public List<DetallePedidoDTO> getDetalles() {
-        return detalles;
+    public Integer getCantidad() {
+        return cantidad;
     }
 
-    public void setDetalles(List<DetallePedidoDTO> detalles) {
-        this.detalles = detalles;
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
     }
 }

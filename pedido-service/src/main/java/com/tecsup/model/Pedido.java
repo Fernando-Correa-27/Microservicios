@@ -1,34 +1,40 @@
 package com.tecsup.model;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Pedido (GLAB-S12): guarda SOLO identificadores remotos.
+ * No hay relaciones JPA con cliente ni producto.
+ */
 @Entity
 @Table(name = "pedido")
 public class Pedido {
 
+    public static final String PENDIENTE = "PENDIENTE";
+    public static final String ATENDIDO = "ATENDIDO";
+    public static final String ANULADO = "ANULADO";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_pedido")
     private Long idPedido;
 
-    private LocalDate fecha;
+    @Column(name = "cliente_id", nullable = false)
+    private Long clienteId;
 
-    private Long idCliente;
+    @Column(name = "producto_id", nullable = false)
+    private Long productoId;
 
-    private BigDecimal total;
+    @Column(nullable = false)
+    private Integer cantidad;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetallePedido> detalles = new ArrayList<>();
+    @Column(nullable = false, length = 20)
+    private String estado = PENDIENTE;
 
     public Pedido() {
     }
@@ -41,35 +47,35 @@ public class Pedido {
         this.idPedido = idPedido;
     }
 
-    public LocalDate getFecha() {
-        return fecha;
+    public Long getClienteId() {
+        return clienteId;
     }
 
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
+    public void setClienteId(Long clienteId) {
+        this.clienteId = clienteId;
     }
 
-    public Long getIdCliente() {
-        return idCliente;
+    public Long getProductoId() {
+        return productoId;
     }
 
-    public void setIdCliente(Long idCliente) {
-        this.idCliente = idCliente;
+    public void setProductoId(Long productoId) {
+        this.productoId = productoId;
     }
 
-    public BigDecimal getTotal() {
-        return total;
+    public Integer getCantidad() {
+        return cantidad;
     }
 
-    public void setTotal(BigDecimal total) {
-        this.total = total;
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
     }
 
-    public List<DetallePedido> getDetalles() {
-        return detalles;
+    public String getEstado() {
+        return estado;
     }
 
-    public void setDetalles(List<DetallePedido> detalles) {
-        this.detalles = detalles;
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }
