@@ -12,10 +12,22 @@
 	<artifactId>pedido-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>pedido-service</name>
-	<description>Microservicio pedido-service - GLAB-S11</description>
+	<description>Microservicio pedido-service - GLAB-S11/S12</description>
 	<properties>
 		<java.version>25</java.version>
+		<spring-cloud.version>2025.1.4</spring-cloud.version>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -39,6 +51,16 @@
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<!-- Eureka Client (GLAB-S12) -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<!-- OpenFeign (GLAB-S12) -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

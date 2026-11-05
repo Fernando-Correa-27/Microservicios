@@ -1,6 +1,8 @@
 server:
   port: 9095
 spring:
+  application:
+    name: pedido-service
   datasource:
     url: jdbc:mysql://servidor/bd_pedido
     username: root
@@ -12,8 +14,11 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
 empresa:
   ambiente: produccion
-servicios:
-  cliente:
-    url: http://localhost:8081
-  producto:
-    url: http://localhost:8083
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
