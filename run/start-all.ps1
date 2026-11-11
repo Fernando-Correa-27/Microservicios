@@ -1,6 +1,7 @@
 param(
     [switch]$SkipBuild,
-    [switch]$CoreOnly
+    [switch]$CoreOnly,
+    [switch]$NoGateway
 )
 
 $ErrorActionPreference = "Stop"
@@ -13,10 +14,11 @@ $env:PATH = "$javaHome\bin;$env:PATH"
 $eureka = @{ name = "eureka-server"; port = 8761 }
 
 # Servicios del laboratorio base (S11/S12). Todos son clientes de Eureka.
+# S13: categoria y producto primero, luego cliente y pedido.
 $core = @(
     @{ name = "categoria-service"; port = 8082 },
-    @{ name = "cliente-service";   port = 8081 },
     @{ name = "producto-service";  port = 8083 },
+    @{ name = "cliente-service";   port = 8081 },
     @{ name = "pedido-service";    port = 8084 }
 )
 
@@ -26,6 +28,9 @@ $clinic = @(
     @{ name = "medico-service";   port = 8086 },
     @{ name = "cita-service";     port = 8087 }
 )
+
+# S13: API Gateway. Se levanta SIEMPRE al final, cuando ya hay servicios registrados.
+$gateway = @{ name = "gateway-service"; port = 8080 }
 
 $services = if ($CoreOnly) { $core } else { $core + $clinic }
 
@@ -91,6 +96,18 @@ foreach ($s in $services) {
         Write-Host "  ERROR $($s.name) no respondio. Revise run\logs\$($s.name).err.log" -ForegroundColor Red
     }
     # Dar tiempo a que se registre en Eureka antes de levantar el siguiente.
+    Start-Sleep -Seconds 3
+}
+
+# 3) API Gateway (S13), después de los servicios para que Eureka ya tenga instancias.
+if (-not $NoGateway) {
+    if (-not $SkipBuild) { Build-Service $gateway.name }
+    Start-Service $gateway.name $gateway.port
+    if (Wait-Port $gateway.name $gateway.port 180) {
+        Write-Host "  OK  $($gateway.name) -> http://localhost:$($gateway.port)" -ForegroundColor Green
+    } else {
+        Write-Host "  ERROR $($gateway.name) no respondio. Revise run\logs\$($gateway.name).err.log" -ForegroundColor Red
+    }
     Start-Sleep -Seconds 3
 }
 
