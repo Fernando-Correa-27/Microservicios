@@ -318,3 +318,109 @@ powershell -ExecutionPolicy Bypass -File run\smoke-test.ps1
 
 Enlaces: [[18 Eureka y service discovery]] · [[12 Pruebas HTTP]]
 
+
+## Comandos GLAB-S13
+
+### Arranque (Eureka → servicios → gateway)
+
+```powershell
+# Compila y levanta Eureka, los 7 servicios y el gateway (gateway al final)
+powershell -ExecutionPolicy Bypass -File run\start-all.ps1
+
+# Solo los 4 servicios base + gateway (sin clínica)
+powershell -ExecutionPolicy Bypass -File run\start-all.ps1 -CoreOnly
+
+# Sin gateway (util para comparar S12 vs S13)
+powershell -ExecutionPolicy Bypass -File run\start-all.ps1 -NoGateway
+
+# Sin recompilar
+powershell -ExecutionPolicy Bypass -File run\start-all.ps1 -SkipBuild
+
+# Detener todo (incluye 8080)
+powershell -ExecutionPolicy Bypass -File run\stop-all.ps1
+```
+
+### Build y arranque manual del gateway
+
+```powershell
+cd gateway-service
+mvn -q -DskipTests package
+
+$java = 'C:\Program Files\Microsoft\jdk-25.0.5.21-hotspot\bin\java.exe'
+$jar  = (Resolve-Path 'target\gateway-service-0.0.1-SNAPSHOT.jar').Path
+Start-Process -FilePath $java -ArgumentList '-jar', "`"$jar`"" `
+  -RedirectStandardOutput ..\run\logs\gateway-service.out.log `
+  -RedirectStandardError  ..\run\logs\gateway-service.err.log `
+  -WindowStyle Hidden
+```
+
+> [!warning] Comillas obligatorias
+> La ruta del proyecto contiene espacios. Sin comillas dobles alrededor de la variable `$jar`, el proceso falla con `Unable to access jarfile C:\Users\lenovo\Documents\Tecsup`.
+
+### Probar por el gateway
+
+```powershell
+curl.exe -s http://localhost:8080/api/categorias
+curl.exe -s http://localhost:8080/api/productos
+curl.exe -s http://localhost:8080/api/clientes
+curl.exe -s http://localhost:8080/api/pedidos/1
+
+# Ruta inexistente → 404 del gateway
+curl.exe -s -w "`nHTTP %{http_code}`n" http://localhost:8080/api/inexistente
+
+# Discovery locator
+curl.exe -s http://localhost:8080/categoria-service/api/categorias
+```
+
+### Rutas y actuator
+
+```powershell
+curl.exe -s http://localhost:8080/actuator/health
+curl.exe -s http://localhost:8080/actuator/gateway/routes
+
+# Solo ids de ruta
+(Invoke-RestMethod http://localhost:8080/actuator/gateway/routes).route_id
+```
+
+> [!note] Requisito
+> `/actuator/gateway/routes` solo responde si el YAML tiene `management.endpoint.gateway.access: READ_ONLY`.
+
+### Logs del gateway
+
+```powershell
+Get-Content run\logs\gateway-service.out.log -Tail 80
+Get-Content run\logs\gateway-service.err.log -Tail 40
+
+# Enrutamiento y balanceo
+Select-String -Path run\logs\gateway-service.out.log -Pattern 'Route matched|lb://|No servers available'
+```
+
+### Pruebas automatizadas
+
+```powershell
+# 42 pruebas por el gateway (incluye detener/reiniciar producto-service)
+powershell -ExecutionPolicy Bypass -File run\gateway-test.ps1
+
+# Colección Postman con Newman (carpetas 00-04, 06, 07)
+powershell -ExecutionPolicy Bypass -File run\newman-s13.ps1
+
+# Regresión S11/S12 contra puertos directos
+powershell -ExecutionPolicy Bypass -File run\smoke-test.ps1
+```
+
+### Eureka
+
+```powershell
+Invoke-WebRequest http://localhost:8761/eureka/apps -Headers @{Accept='application/json'} -UseBasicParsing
+(Invoke-RestMethod http://localhost:8761/eureka/apps -Headers @{Accept='application/json'}).applications.application.name
+```
+
+### UTF-8 por el gateway
+
+```powershell
+$f = "$env:TEMP\cat-utf8.json"
+[System.IO.File]::WriteAllText($f, '{"nombre":"Tecnología","estado":"ACTIVO"}', ([System.Text.UTF8Encoding]::new($false)))
+curl.exe -s -X POST http://localhost:8080/api/categorias -H "Content-Type: application/json; charset=utf-8" --data-binary "@$f"
+```
+
+Enlaces: [[24 gateway-service]] · [[12 Pruebas HTTP]]

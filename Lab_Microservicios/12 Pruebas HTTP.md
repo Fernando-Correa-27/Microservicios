@@ -207,3 +207,129 @@ Incluye cliente, categoría, producto, pedido (contrato S12), paciente, médico,
 
 Enlaces: [[20 Comunicación entre servicios (flujo GET pedido)]] · [[11 Errores y soluciones]]
 
+
+## Pruebas GLAB-S13 por el API Gateway
+
+> [!info] Entorno
+> MySQL 8.4.9 en 3306 · Eureka en 8761 · servicios en 8081–8084 · **gateway en 8080**. Todas las peticiones se hicieron contra `http://localhost:8080` con `curl.exe` desde `run\gateway-test.ps1`. Los cuerpos con tildes se enviaron como UTF-8 sin BOM con `--data-binary @archivo.json`.
+
+### Tabla completa (42 pruebas)
+
+| # | Prueba | Esperado | Obtenido | ✓ |
+|---|---|---|---|---|
+| 1 | GET `/api/categorias` | 200 | 200 | ✓ |
+| 2 | GET `/api/categorias/1` | 200 | 200 | ✓ |
+| 3 | GET `/api/productos` | 200 | 200 | ✓ |
+| 4 | GET `/api/productos/1` | 200 | 200 | ✓ |
+| 5 | GET `/api/clientes` | 200 | 200 | ✓ |
+| 6 | GET `/api/clientes/1` | 200 | 200 | ✓ |
+| 7 | GET `/api/pedidos` | 200 | 200 | ✓ |
+| 8 | GET `/api/pedidos/1` (Feign) | 200 | 200 | ✓ |
+| 9 | POST `/api/categorias` | 201 | 201 | ✓ |
+| 10 | PUT `/api/categorias/{id}` | 200 | 200 | ✓ |
+| 11 | DELETE `/api/categorias/{id}` | 200 | 200 | ✓ |
+| 12 | POST `/api/productos` | 201 | 201 | ✓ |
+| 13 | PUT `/api/productos/{id}` | 200 | 200 | ✓ |
+| 14 | DELETE `/api/productos/{id}` | 200 | 200 | ✓ |
+| 15 | POST `/api/clientes` | 201 | 201 | ✓ |
+| 16 | PUT `/api/clientes/{id}` | 200 | 200 | ✓ |
+| 17 | DELETE `/api/clientes/{id}` | 200 | 200 | ✓ |
+| 18 | POST `/api/pedidos` | 201 | 201 | ✓ |
+| 19 | PUT `/api/pedidos/{id}/anular` | 200 | 200 | ✓ |
+| 20 | PUT `/api/pedidos/{id}/anular` (repetido) | 409 | 409 | ✓ |
+| 21 | PUT `/api/pedidos/{id}/atender` | 200 | 200 | ✓ |
+| 22 | POST `/api/categorias` inválido | 400 | 400 | ✓ |
+| 23 | POST `/api/productos` inválido | 400 | 400 | ✓ |
+| 24 | POST `/api/clientes` inválido | 400 | 400 | ✓ |
+| 25 | POST `/api/pedidos` inválido | 400 | 400 | ✓ |
+| 26 | GET `/api/productos/999999` | 404 | 404 | ✓ |
+| 27 | GET `/api/categorias/999999` | 404 | 404 | ✓ |
+| 28 | GET `/api/inexistente` | 404 | 404 | ✓ |
+| 29 | GET `/api/inexistente/sub` | 404 | 404 | ✓ |
+| 30 | POST `/api/categorias` `"Tecnología"` | 201 | 201 | ✓ |
+| 31 | GET `/api/categorias/{id}` (tilde) | 200 | 200 | ✓ |
+| 32 | DELETE `/api/categorias/{id}` | 200 | 200 | ✓ |
+| 33 | POST `/api/productos` `"Cámara Web Ñandú"` | 201 | 201 | ✓ |
+| 34 | GET `/api/productos/{id}` (tildes) | 200 | 200 | ✓ |
+| 35 | DELETE `/api/productos/{id}` | 200 | 200 | ✓ |
+| 36 | GET `/categoria-service/api/categorias` | 200 | 200 | ✓ |
+| 37 | GET `/producto-service/api/productos` | 200 | 200 | ✓ |
+| 38 | GET `/api/productos` con servicio caído | 503 | 503 | ✓ |
+| 39 | GET `/api/categorias` con producto caído | 200 | 200 | ✓ |
+| 40 | GET `/api/clientes` con producto caído | 200 | 200 | ✓ |
+| 41 | GET `/api/pedidos` con producto caído | 200 | 200 | ✓ |
+| 42 | GET `/api/productos` tras reiniciar | 200 | 200 | ✓ |
+
+**Total: 42 / 42** — evidencia en `run/logs/gateway-test-results.md`.
+
+### Errores propagados intactos
+
+| Caso | Status | Cuerpo observado |
+|---|---|---|
+| POST categoría vacía | 400 | `{"codigo":"400","mensaje":"Error de validación en la petición","errores":{...}}` |
+| POST producto precio 0 / stock -1 | 400 | `"El precio debe ser mayor a cero"`, `"El stock no puede ser negativo"` |
+| POST cliente teléfono 123 | 400 | mapa `errores` con `"El teléfono debe tener exactamente 9 dígitos"` |
+| POST pedido cantidad 0 | 400 | `"La cantidad debe ser mayor a cero"` |
+| GET producto 999999 | 404 | JSON del servicio |
+| GET `/api/inexistente` | 404 | JSON del **gateway** con `path` y `requestId` |
+
+> [!success] El gateway no reescribe errores
+> El status y el cuerpo viajan tal cual desde el servicio. El gateway solo genera sus propios 404 (ruta inexistente) y 503 (sin instancia).
+
+### Servicio caído y recuperación
+
+| Acción | Resultado | Tiempo |
+|---|---|---|
+| Detener `producto-service` (8083) | — | — |
+| `GET /api/productos` por el gateway | **503** `Service Unavailable` | 70 s / 95 s |
+| `GET /api/categorias`, `/clientes`, `/pedidos` | 200 | inmediato |
+| Reiniciar `producto-service` | — | — |
+| `GET /api/productos` | **200** | 10 s / 31 s |
+
+```json
+{"timestamp":"2026-11-11T22:28:52.973Z","path":"/api/productos",
+ "status":503,"error":"Service Unavailable","requestId":"d3ad5568-141"}
+```
+
+Log del balanceador:
+
+```text
+WARN o.s.c.l.core.RoundRobinLoadBalancer : No servers available for service: producto-service
+```
+
+### UTF-8 de punta a punta
+
+| Petición | Resultado |
+|---|---|
+| `POST /api/categorias` `{"nombre":"Tecnología","estado":"ACTIVO"}` | 201, devuelve `Tecnología` |
+| `GET /api/categorias/{id}` | 200, `Tecnología` intacto |
+| `POST /api/productos` `{"nombre":"Cámara Web Ñandú",...}` | 201, `ñ` y `ú` correctas |
+| `GET /api/productos/{id}` | 200, tildes intactas |
+
+### Rutas del gateway
+
+```powershell
+curl.exe -s http://localhost:8080/actuator/gateway/routes
+# 9 rutas: 4 explicitas + 5 del discovery locator (incluye gateway-service)
+```
+
+### Newman (colección Postman)
+
+```text
+Carpetas 00–04, 06, 07 (la 05 incluye el caso 503 manual)
+requests: 29   assertions: 53   failed: 0
+```
+
+Evidencia: `run/logs/newman-s13.log`.
+
+### Cómo repetir
+
+```powershell
+# Todo el gateway (incluye detener y reiniciar producto-service)
+powershell -ExecutionPolicy Bypass -File run\gateway-test.ps1
+
+# Solo la colección Postman
+powershell -ExecutionPolicy Bypass -File run\newman-s13.ps1
+```
+
+Enlaces: [[24 gateway-service]] · [[11 Errores y soluciones]] · [[22 Rutas del gateway (predicados, lb y balanceo)]]

@@ -211,3 +211,24 @@ Sin `@ManyToOne` ni relaciones JPA cruzadas.
 ```
 
 Enlaces: [[20 Comunicación entre servicios (flujo GET pedido)]] · [[19 OpenFeign]] · [[12 Pruebas HTTP]]
+
+## S13 · pedido-service publicado en el API Gateway
+
+| Aspecto | Valor |
+|---|---|
+| Ruta explícita | `Path=/api/pedidos/**` |
+| Destino | `lb://pedido-service` |
+| URL pública | `http://localhost:8080/api/pedidos` |
+| Rutas cubiertas por `/**` | `/api/pedidos`, `/{id}`, `/{id}/anular`, `/{id}/atender` |
+| Ruta del discovery locator | `http://localhost:8080/pedido-service/api/pedidos` |
+
+- Es la ruta que demuestra el flujo **completo** de S13: gateway → pedido → Feign → cliente/producto → vuelta.
+- `GET /api/pedidos/1` por el gateway devuelve el pedido con `cliente` y `producto` (200).
+- `POST` 201 con estado `PENDIENTE`; `PUT /{id}/anular` y `PUT /{id}/atender` → 200; repetir la transición → **409**.
+- `POST` inválido (`cantidad` 0) → **400** propagado sin cambios.
+- No hay `DELETE`: el gateway no cambia la semántica del servicio, solo enruta.
+
+> [!note] Una sola ruta para cuatro endpoints
+> `Path=/api/pedidos/**` cubre todos los subpaths. No hizo falta declarar una ruta por endpoint.
+
+Enlaces: [[24 gateway-service]] · [[20 Comunicación entre servicios (flujo GET pedido)]]

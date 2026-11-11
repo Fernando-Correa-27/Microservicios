@@ -300,3 +300,104 @@ Tomcat initialized with port 9092 (http)
 > Los errores de S12 fueron mayormente de **integración** (registro, orden de arranque, codificación), no de lógica de negocio. Probar contra servicios reales fue lo que los hizo visibles.
 
 Enlaces: [[18 Eureka y service discovery]] · [[19 OpenFeign]] · [[14 Guía original y problemas detectados]]
+
+## Errores y soluciones de GLAB-S13
+
+> [!summary] Tabla rápida
+> | # | Error | Causa | Fix |
+> |---|---|---|---|
+> | 1 | Starter del gateway no encontrado | La guía usa `spring-cloud-starter-gateway`, inexistente en Cloud 2025.1 | `spring-cloud-starter-gateway-server-webflux` |
+> | 2 | Todo responde 404 sin error | Configuración con prefijo viejo `spring.cloud.gateway.*` | Prefijo `spring.cloud.gateway.server.webflux.*` |
+> | 3 | `/actuator/gateway/routes` da 404 | Endpoint con `defaultAccess = NONE` | `management.endpoint.gateway.access: READ_ONLY` |
+> | 4 | El gateway no arranca con `access: read` | El enum `Access` no acepta `read` | Valores válidos: `NONE`, `READ_ONLY`, `UNRESTRICTED` |
+> | 5 | Dos clases main | Paquete generado `com.tecsup.gateway_service` | Mover a `com.tecsup` y borrar el paquete viejo |
+> | 6 | `Unable to access jarfile C:\Users\lenovo\Documents\Tecsup` | Ruta con espacios sin comillas en `Start-Process` | `'-jar', "`"$jar`""` |
+> | 7 | 503 al inicio | Eureka aún no propaga el registro | Esperar/reintentar; fetch de 5 s y leases cortos |
+> | 8 | 503 tarda 70–95 s en aparecer | Evicción de Eureka + caché del balanceador | Es el comportamiento normal; documentado |
+> | 9 | 9 rutas donde se esperaban 8 | El propio gateway se registra en Eureka | Contar 4 explícitas + N registradas |
+> | 10 | `repackage ... Unable to rename` | Jar en ejecución | Detener servicios antes de `mvn package` |
+> | 11 | `spring-boot-starter-webflux-test` no resuelve | No está en el `.m2` local | Usar `spring-boot-starter-test` |
+> | 12 | Scripts `.ps1` con acentos rotos | PowerShell 5.1 lee sin BOM como ANSI | Scripts en ASCII + payloads UTF-8 en archivos |
+
+### 1 · Starter del gateway
+
+```text
+java.lang.ClassNotFoundException: org.springframework.cloud.gateway.config.GatewayAutoConfiguration
+```
+
+La guía usa `spring-cloud-starter-gateway`, que ya no existe en el tren 2025.1.x. Se reemplazó por `spring-cloud-starter-gateway-server-webflux` (variante reactiva/Netty). **No** se agregó `spring-boot-starter-web`.
+
+### 2 · Prefijo de configuración
+
+Con `spring.cloud.gateway.routes` el gateway **arranca sin errores**, pero no carga ninguna ruta y todo devuelve 404. Es el fallo más silencioso del laboratorio.
+
+```yaml
+# mal
+spring.cloud.gateway.routes
+# bien (Gateway 5)
+spring.cloud.gateway.server.webflux.routes
+```
+
+### 3 y 4 · Endpoint de actuator
+
+Inspección del jar 5.0.4:
+
+```java
+@RestControllerEndpoint(id = "gateway", defaultAccess = Access.NONE)
+```
+
+- Solo con `exposure.include: gateway` no aparece en `/actuator`.
+- `access: read` rompe el arranque: `Invalid value 'read' ... Failed to convert to type Access`.
+- `access: READ_ONLY` habilita `GET /actuator/gateway/routes` sin permitir modificaciones.
+
+### 5 · Dos clases main
+
+Spring Initializr generó `com.tecsup.gateway_service.GatewayServiceApplication`; al crear `com.tecsup.GatewayServiceApplication` quedaron dos. Se eliminó el paquete generado.
+
+### 6 · Ruta con espacios en `Start-Process`
+
+```text
+Error: Unable to access jarfile C:\Users\lenovo\Documents\Tecsup
+```
+
+`Start-Process -ArgumentList '-jar', $jar` no cita la ruta. Fix:
+
+```powershell
+Start-Process -FilePath $java -ArgumentList '-jar', "`"$jar`"" ...
+```
+
+### 7 y 8 · Propagación de Eureka y el 503
+
+| Momento | Tiempo observado |
+|---|---|
+| Detener `producto-service` → primer 503 controlado | **70 s** y **95 s** en dos corridas |
+| Reiniciar `producto-service` → primer 200 | **10 s** y **31 s** |
+
+Mientras Eureka no expulsa la instancia muerta, el balanceador intenta conectarse y puede devolver 500/503. El 503 limpio aparece cuando el registro ya no tiene instancias:
+
+```text
+WARN o.s.c.l.core.RoundRobinLoadBalancer : No servers available for service: producto-service
+```
+
+### 9 · Número de rutas
+
+`/actuator/gateway/routes` devolvió **9**, no 8: el discovery locator crea una ruta también para `GATEWAY-SERVICE`. La aserción de Postman se ajustó a “al menos 8 y que existan las 4 explícitas”.
+
+### 10 · Build con el jar en ejecución
+
+Heredado de S12: Windows bloquea el jar y Maven falla al renombrarlo en `repackage`. Solución: `run\stop-all.ps1` antes de compilar.
+
+### 11 · Starter de test
+
+`spring-boot-starter-webflux-test` no estaba en el repositorio local. Se mantuvo `spring-boot-starter-test`, igual que en los otros 7 proyectos.
+
+### 12 · Codificación de scripts
+
+- Los `.ps1` se guardaron en **ASCII** y los datos con tildes en `run\payloads\*.json` (UTF-8 sin BOM), enviados con `curl.exe --data-binary`.
+- En los scripts se construyen las tildes con `[char]0xED`, `[char]0xE1`, etc., para no depender de la codificación del archivo.
+- La consola de Windows muestra mojibake aunque los archivos sean UTF-8 válidos; se verificó leyendo bytes con `[System.Text.UTF8Encoding]::new($false, $true)`.
+
+> [!tip] Lección
+> Los errores de S13 fueron de **configuración y versiones**, no de lógica. Un prefijo equivocado o un starter renombrado no producen un error claro: producen 404 o un fallo de arranque que hay que diagnosticar leyendo el jar y los metadatos.
+
+Enlaces: [[25 Spring Cloud Gateway 5 (cambios y versiones)]] · [[10 Bitácora por pasos]]

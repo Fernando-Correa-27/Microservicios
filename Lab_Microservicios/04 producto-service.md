@@ -132,3 +132,23 @@ Errores verificados:
 - `precio` 0 o negativo → **400**.
 
 Enlaces: [[19 OpenFeign]] · [[12 Pruebas HTTP]]
+
+## S13 · producto-service publicado en el API Gateway
+
+| Aspecto | Valor |
+|---|---|
+| Ruta explícita | `Path=/api/productos/**` |
+| Destino | `lb://producto-service` |
+| URL pública | `http://localhost:8080/api/productos` |
+| Ruta del discovery locator | `http://localhost:8080/producto-service/api/productos` |
+
+- El gateway no reemplaza a Feign: `GET /api/productos` sigue completando la `categoria` anidada porque producto llama a categoria-service.
+- CRUD completo verificado por el gateway: 200/201/200/200.
+- `POST` inválido (`precio` 0, `stock` -1) → **400** con los mensajes del servicio.
+- UTF-8: `{"nombre":"Cámara Web Ñandú"}` creado por el gateway se lee con `ñ` y `ú` correctas.
+- Servicio detenido: `/api/productos` por el gateway → **503** controlado; categorías, clientes y pedidos siguen en 200. Al reiniciar, se recupera en segundos.
+
+> [!important] Caso de estudio de resiliencia
+> Es la ruta usada para demostrar el 503 del gateway: `RoundRobinLoadBalancer` registra `No servers available for service: producto-service` y el gateway responde JSON, no un stack trace.
+
+Enlaces: [[24 gateway-service]] · [[12 Pruebas HTTP]]

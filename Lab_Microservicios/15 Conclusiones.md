@@ -162,3 +162,20 @@ updated: 2026-11-01
 
 Enlaces: [[17 Decisión de versiones Boot 4 + Spring Cloud 2025.1.x]] · [[20 Comunicación entre servicios (flujo GET pedido)]]
 
+
+## Conclusiones GLAB-S13
+
+1. **Un gateway convierte la topología en un contrato.** Antes de S13, cada consumidor necesitaba cuatro URLs y conocía los puertos internos. Ahora conoce un solo host y un prefijo estable (`/api/...`). Eso permite mover, replicar o renombrar servicios sin recompilar clientes; el cambio queda en la configuración del gateway.
+
+2. **Eureka y Gateway resuelven problemas distintos y se necesitan.** Eureka responde “dónde está la instancia viva”; el gateway responde “qué servicio atiende esta URL pública”. `lb://` es el punto exacto donde se unen: una ruta declarativa que solo funciona porque hay un registro detrás. Sin discovery, el gateway sería una tabla de URLs hardcodeadas.
+
+3. **Las versiones no son un detalle de configuración: cambian el contrato del framework.** Gateway 5 renombró el starter y movió toda la configuración a `spring.cloud.gateway.server.webflux.*`. Un prefijo viejo no produce un error: produce un 404 silencioso en todas las rutas. Leer el jar (`@RestControllerEndpoint`, metadatos) fue más útil que adivinar.
+
+4. **El discovery locator es cómodo en desarrollo y peligroso en producción.** Habilitarlo dio rutas gratis para los 5 servicios registrados, incluido el propio gateway, pero expone todo lo que se registre y acopla la URL pública al `spring.application.name`. Dejarlo activo sin entenderlo es una decisión de seguridad, no de comodidad.
+
+5. **Un gateway no elimina la complejidad distribuida: la hace visible en un solo lugar.** El 503 por `producto-service` caído se midió en 70–95 s (evicción de Eureka + caché del balanceador) y la recuperación en 10–31 s. Tener logs DEBUG y `/actuator/gateway/routes` permitió explicar el comportamiento con evidencia en lugar de suponerlo. La siguiente mejora natural es añadir aquí autenticación, rate limiting y métricas.
+
+> [!quote] Cierre
+> “Centralizar la entrada no centraliza la lógica: el gateway decide **a quién** llamar, pero cada servicio sigue siendo dueño de **qué** responder. La calidad del sistema sigue dependiendo de los contratos y de las pruebas reales.”
+
+Enlaces: [[21 API Gateway]] · [[22 Rutas del gateway (predicados, lb y balanceo)]] · [[24 gateway-service]]

@@ -499,3 +499,113 @@ git tag -a s11-final -m "Entrega final GLAB-S11"
 - Este vault actualizado.
 
 Enlaces: [[17 Decisión de versiones Boot 4 + Spring Cloud 2025.1.x]] · [[18 Eureka y service discovery]] · [[19 OpenFeign]] · [[12 Pruebas HTTP]]
+
+## Bitácora GLAB-S13 (2026-11-11)
+
+> [!abstract] Resumen
+> S13 se construyó sobre el tag `s12-final`. Se migró `gateway-service` a Spring Cloud Gateway 5 (WebFlux), se publicaron las 4 rutas de negocio con `lb://`, se habilitó el endpoint de actuator, se probó todo por `http://localhost:8080` (42/42) y se actualizó Postman y este vault.
+
+### Paso 0 · Congelar S12
+
+```powershell
+git add -A
+git commit -m "chore: estado final de GLAB-S12 antes de iniciar GLAB-S13"
+git tag -a s12-final -m "Entrega final GLAB-S12"
+```
+
+Resultado: commit `0296fbe` y tag `s12-final`. A partir de aquí, todos los commits son locales (sin push).
+
+### Paso 1 · Verificar el punto de partida
+
+- MySQL **8.4.9** en 3306 respondiendo; existen las 7 BD `bd_*_dev`.
+- `run\start-all.ps1 -CoreOnly` levantó eureka + categoria + producto + cliente + pedido; los 4 aparecieron **UP** en Eureka.
+- `GET http://localhost:8084/api/pedidos/1` devolvió cliente y producto (OpenFeign de S12 operativo).
+- Puerto **8080 libre** (sin Tomcat de XAMPP).
+
+### Paso 2 · Alinear `gateway-service` a Boot 4 / Gateway 5
+
+- El `pom.xml` generado ya tenía Boot 4.1.2 y Java 25, pero usaba `spring-cloud-starter-gateway-server-webmvc` y **no** tenía BOM de Spring Cloud ni clientes de Eureka.
+- Se reescribió el pom: `spring-cloud-starter-gateway-server-webflux`, `spring-cloud-starter-netflix-eureka-client`, `spring-cloud-starter-loadbalancer`, actuator, test y BOM `spring-cloud-dependencies` **2025.1.4**.
+- Se movió la clase de `com.tecsup.gateway_service` a **`com.tecsup`** y se agregó `@EnableDiscoveryClient`.
+- Se eliminó el paquete viejo para no dejar dos clases main (error ya visto en S11).
+
+### Paso 3 · `application.yaml` con el prefijo nuevo
+
+- `spring.cloud.gateway.server.webflux.*` para rutas y discovery locator.
+- Rutas iniciales: categoria (`/api/categorias/**`) y producto (`/api/productos/**`).
+- `discovery.locator.enabled: true` + `lower-case-service-id: true`.
+- `logging.level.org.springframework.cloud.gateway: DEBUG` y `...loadbalancer: DEBUG`.
+- Sección `eureka` con `defaultZone: http://localhost:8761/eureka`, `registry-fetch-interval-seconds: 5`, leases de 5/10 s y `disable-delta: true`.
+
+### Paso 4 · Build y primer arranque
+
+```powershell
+cd gateway-service
+mvn -q -DskipTests package     # EXIT=0
+```
+
+Primer arranque falló:
+
+```text
+Error: Unable to access jarfile C:\Users\lenovo\Documents\Tecsup
+```
+
+Causa: `Start-Process -ArgumentList '-jar', $jar` partió la ruta por los espacios. Fix: `'-jar', "`"$jar`""`.
+
+Segundo arranque correcto:
+
+```text
+Registering application GATEWAY-SERVICE with eureka with status UP
+Discovery Client initialized ... with initial instances count: 4
+```
+
+### Paso 5 · Verificación de la Parte 1
+
+| Petición | Resultado |
+|---|---|
+| `GET http://localhost:8080/api/categorias` | 200 |
+| `GET http://localhost:8080/api/productos` | 200 (con `categoria` anidada) |
+| `GET http://localhost:8080/categoria-service/api/categorias` | 200 (discovery locator) |
+| `GET http://localhost:8080/api/inexistente` | 404 del gateway |
+
+Los logs DEBUG mostraron `Route matched: producto-service` y `Mapping [Exchange: GET http://localhost:8080/api/productos] to Route{... uri=lb://producto-service}`: el enrutamiento con balanceo quedó confirmado.
+
+### Paso 6 · Parte 2 · publicar cliente y pedido
+
+- Se agregaron las rutas `cliente-service` (`/api/clientes/**`) y `pedido-service` (`/api/pedidos/**`) con `lb://`.
+- `/**` cubre `/api/pedidos/{id}/anular` y `/api/pedidos/{id}/atender`, así que no se necesitaron rutas adicionales.
+- Se reconstruyó y reinició el gateway; las 4 rutas quedaron activas.
+
+### Paso 7 · Endpoint opcional de actuator
+
+- `GET /actuator` listaba solo `info` y `health`; `/actuator/gateway/routes` devolvía 404.
+- Se inspeccionó el jar de Gateway 5.0.4: `@RestControllerEndpoint(id = "gateway", defaultAccess = Access.NONE)`.
+- Primer intento `management.endpoint.gateway.access: read` → **el gateway no arrancó** (`Failed to convert to type Access`).
+- Correcto: `access: READ_ONLY` (valores válidos: `NONE`, `READ_ONLY`, `UNRESTRICTED`).
+- Resultado: `/actuator/gateway/routes` → 200 con **9 rutas** (4 explícitas + 5 del discovery locator, incluida la del propio gateway).
+
+### Paso 8 · Matriz de pruebas por el gateway
+
+```powershell
+powershell -ExecutionPolicy Bypass -File run\gateway-test.ps1
+```
+
+**42/42 OK**. Incluye CRUD en las 4 rutas, 400/404/409, UTF-8, discovery locator y el caso de servicio caído.
+
+- `producto-service` detenido → `/api/productos` respondió **503** a los **95 s** (evicción de Eureka + refresco del balanceador); las otras 3 rutas siguieron en 200.
+- Al reiniciar `producto-service`, la ruta se recuperó en **31 s**.
+
+### Paso 9 · Postman y Newman
+
+- Nueva colección `postman/GLAB-S13-Microservicios.postman_collection.json` con `baseUrl = http://localhost:8080`, 8 carpetas y 36 requests.
+- Newman (carpetas 00–04, 06 y 07): **29 requests, 53 aserciones, 0 fallos**.
+- La carpeta 05 incluye el caso 503 que exige detener producto-service; se validó con `run\gateway-test.ps1` (no con Newman).
+- Ajuste: la aserción de rutas esperaba 8 y encontró **9** porque el gateway también se registra en Eureka. Se cambió a “al menos 8 y existen las 4 explícitas”.
+
+### Paso 10 · Scripts y bitácora
+
+- `run\start-all.ps1`: el gateway se levanta **al final**, con `-NoGateway` para omitirlo y `-CoreOnly` para no incluir la clínica.
+- `run\stop-all.ps1`: incluye el puerto **8080**.
+- Este vault: notas 21–25 nuevas y actualización de MOC, arquitectura, servicios, errores, pruebas, guía, conclusiones y comandos.
+
+Enlaces: [[24 gateway-service]] · [[25 Spring Cloud Gateway 5 (cambios y versiones)]] · [[12 Pruebas HTTP]]

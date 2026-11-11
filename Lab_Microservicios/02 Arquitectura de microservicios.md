@@ -197,3 +197,75 @@ flowchart LR
 > - Comunicación solo por REST (OpenFeign en producto y pedido).
 
 Enlaces: [[18 Eureka y service discovery]] · [[19 OpenFeign]] · [[20 Comunicación entre servicios (flujo GET pedido)]]
+
+## S13 · Arquitectura con API Gateway
+
+> [!info] Qué cambia
+> Aparece un **punto único de entrada** (`gateway-service`, puerto 8080). El cliente ya no conoce los puertos 8081–8084: solo conoce `/api/...` en el gateway. El gateway resuelve el destino con `lb://` consultando a Eureka. Las llamadas internas entre servicios (OpenFeign) **no pasan** por el gateway.
+
+```mermaid
+flowchart LR
+    subgraph Clientes["Consumidores"]
+        C["Frontend / Postman / curl"]
+    end
+
+    subgraph Entrada["Punto único de entrada"]
+        GW["gateway-service<br/>:8080<br/>Spring Cloud Gateway 5"]
+    end
+
+    subgraph Descubrimiento["Service discovery"]
+        EU["eureka-server<br/>:8761"]
+    end
+
+    subgraph Catalogo["Catálogo y ventas"]
+        CLI["cliente-service<br/>:8081"]
+        CAT["categoria-service<br/>:8082"]
+        PRO["producto-service<br/>:8083"]
+        PED["pedido-service<br/>:8084"]
+    end
+
+    subgraph Clinica["Clínica (opcional)"]
+        PAC["paciente-service<br/>:8085"]
+        MED["medico-service<br/>:8086"]
+        CIT["cita-service<br/>:8087"]
+    end
+
+    C -->|"http://localhost:8080"| GW
+    GW -->|"/api/clientes/**"| CLI
+    GW -->|"/api/categorias/**"| CAT
+    GW -->|"/api/productos/**"| PRO
+    GW -->|"/api/pedidos/**"| PED
+
+    GW -.->|"resuelve lb://"| EU
+    CLI -.->|"registra"| EU
+    CAT -.->|"registra"| EU
+    PRO -.->|"registra"| EU
+    PED -.->|"registra"| EU
+    PAC -.->|"registra"| EU
+    MED -.->|"registra"| EU
+    CIT -.->|"registra"| EU
+
+    PRO -.->|"Feign: categoria-service"| CAT
+    PED -.->|"Feign: cliente-service"| CLI
+    PED -.->|"Feign: producto-service"| PRO
+```
+
+> [!important] Dos caminos distintos
+> - **Norte-sur (entrada):** cliente → **gateway** → servicio. Centraliza el acceso público.
+> - **Este-oeste (interno):** servicio → **Feign/Eureka** → servicio. No pasa por el gateway.
+>
+> Por eso `GET /api/pedidos/1` recorre: gateway → pedido-service → (Feign) cliente-service + producto-service → vuelve al gateway → cliente.
+
+### Tabla de acceso
+
+| Recurso | Antes (S12) | Ahora (S13) |
+|---|---|---|
+| Categorías | `http://localhost:8082/api/categorias` | `http://localhost:8080/api/categorias` |
+| Productos | `http://localhost:8083/api/productos` | `http://localhost:8080/api/productos` |
+| Clientes | `http://localhost:8081/api/clientes` | `http://localhost:8080/api/clientes` |
+| Pedidos | `http://localhost:8084/api/pedidos` | `http://localhost:8080/api/pedidos` |
+
+> [!warning] El acceso directo sigue existiendo
+> Los servicios siguen escuchando en 8081–8084. El gateway centraliza, no aísla. En producción se restringe por red.
+
+Enlaces: [[21 API Gateway]] · [[22 Rutas del gateway (predicados, lb y balanceo)]] · [[24 gateway-service]]

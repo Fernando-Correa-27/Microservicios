@@ -90,3 +90,19 @@ El handler traduce `DuplicateResourceException` a **409 Conflict**. En actualiza
 Validaciones vigentes: nombre, apellidos, dirección, teléfono, estado y `nroDni` obligatorios; DNI exactamente 8 dígitos (`@Pattern("\\d{8}")`). DNI duplicado → **409**.
 
 Enlaces: [[19 OpenFeign]] · [[12 Pruebas HTTP]]
+
+## S13 · cliente-service publicado en el API Gateway
+
+| Aspecto | Valor |
+|---|---|
+| Ruta explícita | `Path=/api/clientes/**` |
+| Destino | `lb://cliente-service` |
+| URL pública | `http://localhost:8080/api/clientes` |
+| Ruta del discovery locator | `http://localhost:8080/cliente-service/api/clientes` |
+
+- Sin cambios en el servicio; solo se publicó su prefijo real `/api/clientes`.
+- CRUD verificado por el gateway: lista, por id, `POST` 201, `PUT` 200, `DELETE` 200.
+- Validación: `POST` con teléfono de 3 dígitos y DNI de 1 dígito → **400** con el mapa `errores` por campo intacto.
+- Sigue siendo consumido por `pedido-service` vía Feign (`cliente-service`), sin pasar por el gateway.
+
+Enlaces: [[24 gateway-service]] · [[22 Rutas del gateway (predicados, lb y balanceo)]]

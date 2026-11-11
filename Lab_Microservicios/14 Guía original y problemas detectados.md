@@ -372,3 +372,35 @@ public ResponseEntity<Cita> cancelar(@PathVariable Integer id) {
 
 Enlaces: [[17 Decisión de versiones Boot 4 + Spring Cloud 2025.1.x]] · [[11 Errores y soluciones]]
 
+
+## Inconsistencias y trampas de la guía S13
+
+| # | Problema en la guía | Corrección aplicada |
+|---|---|---|
+| 1 | El paso 3 habla de la carpeta `gateway-server`, pero el proyecto se llama `gateway-service` | Se usó el nombre real del proyecto |
+| 2 | Hay **dos pasos numerados 6** | Se renumeró la bitácora (Pasos 5 y 6 reales) |
+| 3 | Starter `spring-cloud-starter-gateway` (Gateway 4) | `spring-cloud-starter-gateway-server-webflux` (Gateway 5) |
+| 4 | Prefijo `spring.cloud.gateway.*` | `spring.cloud.gateway.server.webflux.*` |
+| 5 | Asume Spring Boot 3.5.x + Spring Cloud 2025.0.0 + Java 17 | Boot 4.1.2 + Cloud 2025.1.4 + Java 25, como el resto del proyecto |
+| 6 | El paso “Revisar Eureka-Server” lista URLs del gateway | Se hicieron **las dos**: captura de `GATEWAY-SERVICE` en Eureka y pruebas por 8080 |
+| 7 | No advierte que el discovery locator expone **todos** los servicios registrados | Se dejó activo como pide la guía y se documentó el riesgo (ver [[23 Discovery locator vs rutas explícitas]]) |
+| 8 | No menciona que Eureka tarda en propagar y que aparecen 503 iniciales | Se midieron tiempos (70–95 s para el 503; 10–31 s para recuperar) y se ajustaron fetch/leases |
+| 9 | No aclara que el acceso directo a 8081–8084 sigue funcionando | Se documentó como limitación y como mejora (exponer solo el gateway) |
+| 10 | `/actuator/gateway/routes` se presenta como opcional “si funciona con Boot 4” | Se habilitó con `management.endpoint.gateway.access: READ_ONLY` y se documentó el cambio de modelo de acceso |
+| 11 | El pom de la guía no incluye `spring-cloud-starter-loadbalancer` | Se agregó explícitamente para `lb://` |
+| 12 | No indica el paquete base correcto para el gateway | Se movió a `com.tecsup` para evitar dos clases main |
+| 13 | No menciona que no se debe agregar `spring-boot-starter-web` al gateway | Se dejó solo WebFlux/Netty |
+
+> [!note] Sobre el paso 3 de la guía
+> Importar el módulo en IntelliJ se omitió por indicación del usuario; lo hará manualmente.
+
+### Diferencias que no son errores de la guía
+
+| Diferencia | Motivo |
+|---|---|
+| Rutas explícitas a los 4 servicios | La Parte 2 las pide; la guía solo muestra 2 |
+| `cliente-service` en 8081 y `categoria-service` en 8082 | Orden real de S11/S12, distinto al ejemplo de la guía |
+| Servicios de clínica (8085–8087) sin ruta explícita | Son opcionales; quedan accesibles por el discovery locator |
+| `GET /api/pedidos/{id}` devuelve `estado` | Contrato de S12, no de S13 |
+
+Enlaces: [[25 Spring Cloud Gateway 5 (cambios y versiones)]] · [[11 Errores y soluciones]]

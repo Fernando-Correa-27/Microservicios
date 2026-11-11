@@ -70,3 +70,22 @@ curl.exe -s -X POST http://localhost:8082/api/categorias `
 Verificación real: `GET http://localhost:8761/eureka/apps` mostró `CATEGORIA-SERVICE -> UP`. El nombre con tilde `"Tecnología"` se guardó y recuperó correctamente en UTF-8.
 
 Enlaces: [[18 Eureka y service discovery]] · [[12 Pruebas HTTP]]
+
+## S13 · categoria-service publicado en el API Gateway
+
+| Aspecto | Valor |
+|---|---|
+| Ruta explícita | `Path=/api/categorias/**` |
+| Destino | `lb://categoria-service` |
+| URL pública | `http://localhost:8080/api/categorias` |
+| Ruta del discovery locator | `http://localhost:8080/categoria-service/api/categorias` |
+
+- No se tocó código Java del servicio: el gateway solo enruta.
+- El servicio sigue escuchando en **8082** y sigue registrado como `CATEGORIA-SERVICE -> UP`.
+- Verificado por el gateway: `GET` lista y por id, `POST` 201, `PUT` 200, `DELETE` 200, `POST` inválido 400 y `GET /999999` 404 con el JSON del servicio intacto.
+- UTF-8: `POST {"nombre":"Tecnología"}` por el gateway devuelve 201 y la tilde se conserva al leerlo.
+
+> [!tip] Doble camino
+> `GET /api/productos` por el gateway termina mostrando la `categoria` anidada porque **producto-service** llama a **categoria-service** por Feign. Es decir, el gateway solo interviene en la primera llamada; el resto es tráfico interno.
+
+Enlaces: [[24 gateway-service]] · [[22 Rutas del gateway (predicados, lb y balanceo)]]
