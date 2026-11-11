@@ -503,7 +503,7 @@ Enlaces: [[17 Decisión de versiones Boot 4 + Spring Cloud 2025.1.x]] · [[18 Eu
 ## Bitácora GLAB-S13 (2026-11-11)
 
 > [!abstract] Resumen
-> S13 se construyó sobre el tag `s12-final`. Se migró `gateway-service` a Spring Cloud Gateway 5 (WebFlux), se publicaron las 4 rutas de negocio con `lb://`, se habilitó el endpoint de actuator, se probó todo por `http://localhost:8080` (42/42) y se actualizó Postman y este vault.
+> S13 se construyó sobre el tag `s12-final`. Se migró `gateway-service` a Spring Cloud Gateway 5 (WebFlux), se publicaron las 7 rutas de negocio con `lb://` (4 del catálogo + 3 de la clínica), se habilitó el endpoint de actuator, se probó todo por `http://localhost:8080` (42/42) y se actualizó Postman y este vault.
 
 ### Paso 0 · Congelar S12
 
@@ -582,7 +582,7 @@ Los logs DEBUG mostraron `Route matched: producto-service` y `Mapping [Exchange:
 - Se inspeccionó el jar de Gateway 5.0.4: `@RestControllerEndpoint(id = "gateway", defaultAccess = Access.NONE)`.
 - Primer intento `management.endpoint.gateway.access: read` → **el gateway no arrancó** (`Failed to convert to type Access`).
 - Correcto: `access: READ_ONLY` (valores válidos: `NONE`, `READ_ONLY`, `UNRESTRICTED`).
-- Resultado: `/actuator/gateway/routes` → 200 con **9 rutas** (4 explícitas + 5 del discovery locator, incluida la del propio gateway).
+- Resultado: `/actuator/gateway/routes` → 200 con **15 rutas** (7 explícitas + 8 del discovery locator, incluida la del propio gateway y las 3 de la clínica).
 
 ### Paso 8 · Matriz de pruebas por el gateway
 
@@ -597,10 +597,10 @@ powershell -ExecutionPolicy Bypass -File run\gateway-test.ps1
 
 ### Paso 9 · Postman y Newman
 
-- Nueva colección `postman/GLAB-S13-Microservicios.postman_collection.json` con `baseUrl = http://localhost:8080`, 8 carpetas y 36 requests.
-- Newman (carpetas 00–04, 06 y 07): **29 requests, 53 aserciones, 0 fallos**.
+- Nueva colección `postman/GLAB-S13-Microservicios.postman_collection.json` con `baseUrl = http://localhost:8080`, 9 carpetas y 41 requests (incluye la carpeta 08 con la clínica).
+- Newman (carpetas 00–04, 06, 07 y 08): **34 requests, 63 aserciones, 0 fallos**.
 - La carpeta 05 incluye el caso 503 que exige detener producto-service; se validó con `run\gateway-test.ps1` (no con Newman).
-- Ajuste: la aserción de rutas esperaba 8 y encontró **9** porque el gateway también se registra en Eureka. Se cambió a “al menos 8 y existen las 4 explícitas”.
+- Ajuste: la aserción de rutas esperaba un número fijo y el discovery locator agrega una ruta por servicio registrado (incluido el propio gateway). Se cambió a “al menos 8 y que existan las rutas explícitas”.
 
 ### Paso 10 · Scripts y bitácora
 

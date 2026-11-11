@@ -314,7 +314,7 @@ Enlaces: [[18 Eureka y service discovery]] · [[19 OpenFeign]] · [[14 Guía ori
 > | 6 | `Unable to access jarfile C:\Users\lenovo\Documents\Tecsup` | Ruta con espacios sin comillas en `Start-Process` | `'-jar', "`"$jar`""` |
 > | 7 | 503 al inicio | Eureka aún no propaga el registro | Esperar/reintentar; fetch de 5 s y leases cortos |
 > | 8 | 503 tarda 70–95 s en aparecer | Evicción de Eureka + caché del balanceador | Es el comportamiento normal; documentado |
-> | 9 | 9 rutas donde se esperaban 8 | El propio gateway se registra en Eureka | Contar 4 explícitas + N registradas |
+> | 9 | Conteo de rutas inesperado (9, luego 15) | El discovery locator crea una ruta por servicio registrado, incluido el gateway y la clínica | Contar rutas explícitas + apps registradas |
 > | 10 | `repackage ... Unable to rename` | Jar en ejecución | Detener servicios antes de `mvn package` |
 > | 11 | `spring-boot-starter-webflux-test` no resuelve | No está en el `.m2` local | Usar `spring-boot-starter-test` |
 > | 12 | Scripts `.ps1` con acentos rotos | PowerShell 5.1 lee sin BOM como ANSI | Scripts en ASCII + payloads UTF-8 en archivos |
@@ -381,7 +381,7 @@ WARN o.s.c.l.core.RoundRobinLoadBalancer : No servers available for service: pro
 
 ### 9 · Número de rutas
 
-`/actuator/gateway/routes` devolvió **9**, no 8: el discovery locator crea una ruta también para `GATEWAY-SERVICE`. La aserción de Postman se ajustó a “al menos 8 y que existan las 4 explícitas”.
+`/actuator/gateway/routes` devolvió **9** al principio y **15** al publicar la clínica: el discovery locator crea una ruta por cada app registrada (incluido `GATEWAY-SERVICE`). La aserción de Postman se ajustó a “al menos 8 y que existan las rutas explícitas”.
 
 ### 10 · Build con el jar en ejecución
 

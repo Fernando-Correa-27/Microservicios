@@ -35,6 +35,22 @@ spring:
               predicates:
                 - Path=/api/pedidos/**
 
+            # Servicios de la clinica (S11). Opcionales, pero publicados tambien.
+            - id: paciente-service
+              uri: lb://paciente-service
+              predicates:
+                - Path=/api/pacientes/**
+
+            - id: medico-service
+              uri: lb://medico-service
+              predicates:
+                - Path=/api/medicos/**,/api/especialidades/**,/api/horarios/**
+
+            - id: cita-service
+              uri: lb://cita-service
+              predicates:
+                - Path=/api/citas/**
+
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG

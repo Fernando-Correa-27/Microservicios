@@ -53,8 +53,8 @@ GET http://localhost:8080/producto-service/api/productos
 
 ## Lo que se observó en el laboratorio
 
-1. Con `enabled: true` aparecieron **5 rutas automáticas**: una por cada servicio registrado (`categoria`, `producto`, `cliente`, `pedido`) **más la del propio `gateway-service`**, que también se registra en Eureka.
-2. El listado de `/actuator/gateway/routes` mostró **9 rutas**: 4 explícitas + 5 automáticas.
+1. Con `enabled: true` apareció **una ruta automática por cada servicio registrado**: las 4 del catálogo, las 3 de la clínica y la del propio `gateway-service` (8 en total).
+2. El listado de `/actuator/gateway/routes` mostró **15 rutas**: 7 explícitas + 8 automáticas.
 3. Las rutas automáticas **no reescriben** el prefijo: `/categoria-service/api/categorias` se reenvía tal cual al servicio, y por eso incluye `/api/categorias` después del nombre del servicio.
 4. Ambas formas conviven sin conflicto porque los predicados son distintos (`/api/...` vs `/{service-id}/...`).
 
@@ -77,7 +77,7 @@ categoria-service                                  ->  /api/categorias/**      -
 ## Decisión en S13
 
 - Se dejó `enabled: true` **porque la guía lo exige** y sirve para demostrar el concepto.
-- Se añadieron rutas explícitas para las 4 APIs reales, que son las que usa Postman.
+- Se añadieron rutas explícitas para las 7 APIs reales (4 del catálogo + 3 de la clínica), que son las que usa Postman.
 - Se documenta que en producción se debería poner `enabled: false` y publicar solo rutas explícitas.
 
 ```yaml

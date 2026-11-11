@@ -401,7 +401,7 @@ Select-String -Path run\logs\gateway-service.out.log -Pattern 'Route matched|lb:
 # 42 pruebas por el gateway (incluye detener/reiniciar producto-service)
 powershell -ExecutionPolicy Bypass -File run\gateway-test.ps1
 
-# Colección Postman con Newman (carpetas 00-04, 06, 07)
+# Colección Postman con Newman (carpetas 00-04, 06, 07 y 08)
 powershell -ExecutionPolicy Bypass -File run\newman-s13.ps1
 
 # Regresión S11/S12 contra puertos directos

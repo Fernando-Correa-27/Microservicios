@@ -114,7 +114,7 @@ Errores reales durante la implementación:
 |---|---|
 | Solo `exposure.include: gateway` | `/actuator` no lista `gateway`; `/actuator/gateway/routes` → 404 |
 | `access: read` | **Falla el arranque**: `Failed to convert to type Access` |
-| `access: READ_ONLY` | ✅ `/actuator/gateway/routes` → 200 con las 9 rutas |
+| `access: READ_ONLY` | ✅ `/actuator/gateway/routes` → 200 con las 15 rutas |
 
 > [!note] ¿Por qué `READ_ONLY` y no `UNRESTRICTED`?
 > `READ_ONLY` permite consultar rutas pero bloquea `POST`/`DELETE` sobre `/actuator/gateway/routes`, que permitirían modificar rutas en caliente. Para un laboratorio de solo lectura es la opción correcta.

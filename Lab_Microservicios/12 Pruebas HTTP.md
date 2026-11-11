@@ -310,14 +310,14 @@ WARN o.s.c.l.core.RoundRobinLoadBalancer : No servers available for service: pro
 
 ```powershell
 curl.exe -s http://localhost:8080/actuator/gateway/routes
-# 9 rutas: 4 explicitas + 5 del discovery locator (incluye gateway-service)
+# 15 rutas: 7 explicitas + 8 del discovery locator (incluye gateway-service y clinica)
 ```
 
 ### Newman (colección Postman)
 
 ```text
-Carpetas 00–04, 06, 07 (la 05 incluye el caso 503 manual)
-requests: 29   assertions: 53   failed: 0
+Carpetas 00-04, 06, 07 y 08 (la 05 incluye el caso 503 manual)
+requests: 34   assertions: 63   failed: 0
 ```
 
 Evidencia: `run/logs/newman-s13.log`.

@@ -74,7 +74,7 @@ producto-service :8094  ─┘
 ### 4. Administración de servicios
 
 - Rutas declarativas en YAML, versionables en Git.
-- `/actuator/gateway/routes` lista las rutas activas (9 en este lab: 4 explícitas + 5 del discovery locator).
+- `/actuator/gateway/routes` lista las rutas activas (15 en este lab: 7 explícitas + 8 del discovery locator).
 - Un cambio de ruta es un cambio de configuración, no de código del cliente.
 
 ### 5. Aislamiento del cliente respecto a la topología
@@ -105,7 +105,7 @@ flowchart LR
 | **Pregunta que responde** | ¿Dónde está la instancia viva de este servicio? | ¿A qué servicio corresponde esta URL pública? |
 | **Dirección del tráfico** | Interno, servicio → servicio | Entrada, cliente → sistema |
 | **Qué expone** | Un registro de nombres lógicos e IP/puerto | Un contrato HTTP estable (`/api/...`) |
-| **En este lab** | `:8761`, 6 apps UP | `:8080`, 4 rutas públicas |
+| **En este lab** | `:8761`, 8 apps UP | `:8080`, 7 rutas públicas |
 | **Sin él** | OpenFeign y `lb://` no resuelven nombres | El cliente necesita conocer 4 puertos |
 
 > [!important] Se complementan

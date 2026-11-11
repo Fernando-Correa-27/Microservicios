@@ -62,8 +62,8 @@ estado: completado
 | S13 · Parte 1 | gateway-service en 8080 con rutas categoria y producto | ✅ Completado y probado |
 | S13 · Parte 2 | Rutas cliente y pedido publicadas por el gateway | ✅ Completado y probado |
 | S13 | CRUD + 400/404/503 + UTF-8 por el gateway | ✅ 42/42 pruebas |
-| S13 | Colección Postman con `baseUrl = :8080` (Newman 29 requests) | ✅ 53/53 aserciones |
-| S13 | Actuator `/actuator/gateway/routes` | ✅ 9 rutas listadas |
+| S13 | Colección Postman con `baseUrl = :8080` (Newman 34 requests) | ✅ 63/63 aserciones |
+| S13 | Actuator `/actuator/gateway/routes` | ✅ 15 rutas listadas (7 explícitas + 8 del locator) |
 | Bitácora | Este vault | ✅ Actualizado a S13 |
 
 ## Puertos de un vistazo

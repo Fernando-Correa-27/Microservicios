@@ -398,9 +398,9 @@ Enlaces: [[17 Decisión de versiones Boot 4 + Spring Cloud 2025.1.x]] · [[11 Er
 
 | Diferencia | Motivo |
 |---|---|
-| Rutas explícitas a los 4 servicios | La Parte 2 las pide; la guía solo muestra 2 |
+| Rutas explícitas a los 4 servicios del catálogo | La Parte 2 las pide; la guía solo muestra 2 |
 | `cliente-service` en 8081 y `categoria-service` en 8082 | Orden real de S11/S12, distinto al ejemplo de la guía |
-| Servicios de clínica (8085–8087) sin ruta explícita | Son opcionales; quedan accesibles por el discovery locator |
+| Servicios de clínica (8085–8087) también con ruta explícita | Son opcionales; se publicaron igual que el catálogo |
 | `GET /api/pedidos/{id}` devuelve `estado` | Contrato de S12, no de S13 |
 
 Enlaces: [[25 Spring Cloud Gateway 5 (cambios y versiones)]] · [[11 Errores y soluciones]]

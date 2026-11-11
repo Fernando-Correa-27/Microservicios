@@ -138,6 +138,22 @@ spring:
               predicates:
                 - Path=/api/pedidos/**
 
+            # Servicios de la clinica (S11). Opcionales, publicados tambien.
+            - id: paciente-service
+              uri: lb://paciente-service
+              predicates:
+                - Path=/api/pacientes/**
+
+            - id: medico-service
+              uri: lb://medico-service
+              predicates:
+                - Path=/api/medicos/**,/api/especialidades/**,/api/horarios/**
+
+            - id: cita-service
+              uri: lb://cita-service
+              predicates:
+                - Path=/api/citas/**
+
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
@@ -181,6 +197,9 @@ management:
 | `/api/productos/**` | `lb://producto-service` | 8083 |
 | `/api/clientes/**` | `lb://cliente-service` | 8081 |
 | `/api/pedidos/**` | `lb://pedido-service` | 8084 |
+| `/api/pacientes/**` | `lb://paciente-service` | 8085 (clínica) |
+| `/api/medicos/**`, `/api/especialidades/**`, `/api/horarios/**` | `lb://medico-service` | 8086 (clínica) |
+| `/api/citas/**` | `lb://cita-service` | 8087 (clínica) |
 | `/{service-id}/**` | `lb://{SERVICE-ID}` | discovery locator |
 | `/actuator/health` | — | health del gateway |
 | `/actuator/gateway/routes` | — | rutas activas |
@@ -205,9 +224,10 @@ GATEWAY-SERVICE -> UP
 | `GET /api/categorias` | 200 |
 | `GET /api/productos` (con `categoria` anidada) | 200 |
 | `GET /api/pedidos/1` (cliente + producto por Feign) | 200 |
-| `POST /api/...` en las 4 rutas | 201 |
+| `POST /api/...` en las 4 rutas del catálogo | 201 |
 | `PUT`/`DELETE` en categoría, producto y cliente | 200 |
 | `PUT /api/pedidos/{id}/anular` y `/atender` | 200 |
+| Clínica: `GET /api/pacientes`, `/api/medicos`, `/api/especialidades`, `/api/citas`, `/api/medicos/1/horarios` | 200 |
 | Body inválido | 400 con el JSON del servicio intacto |
 | Recurso inexistente | 404 del servicio |
 | Ruta inexistente | 404 del gateway |

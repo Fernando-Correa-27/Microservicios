@@ -81,6 +81,12 @@ DEBUG o.s.c.g.h.RoutePredicateHandlerMapping : Mapping [Exchange: GET http://loc
 | `producto-service` | `Path=/api/productos/**` | `lb://producto-service` | 8083 |
 | `cliente-service` | `Path=/api/clientes/**` | `lb://cliente-service` | 8081 |
 | `pedido-service` | `Path=/api/pedidos/**` | `lb://pedido-service` | 8084 |
+| `paciente-service` | `Path=/api/pacientes/**` | `lb://paciente-service` | 8085 |
+| `medico-service` | `Path=/api/medicos/**,/api/especialidades/**,/api/horarios/**` | `lb://medico-service` | 8086 |
+| `cita-service` | `Path=/api/citas/**` | `lb://cita-service` | 8087 |
+
+> [!note] Servicios de la clínica (S11)
+> Son opcionales, pero se publicaron igual que los cuatro del catálogo. `medico-service` expone tres prefijos (`/api/medicos`, `/api/especialidades` y `/api/horarios`), por eso su predicado tiene varios `Path` separados por coma (se evalúan con `OR`).
 
 Rutas extra que crea el discovery locator (una por app registrada):
 
@@ -90,6 +96,9 @@ Rutas extra que crea el discovery locator (una por app registrada):
 | `/producto-service/**` | `lb://PRODUCTO-SERVICE` |
 | `/cliente-service/**` | `lb://CLIENTE-SERVICE` |
 | `/pedido-service/**` | `lb://PEDIDO-SERVICE` |
+| `/paciente-service/**` | `lb://PACIENTE-SERVICE` |
+| `/medico-service/**` | `lb://MEDICO-SERVICE` |
+| `/cita-service/**` | `lb://CITA-SERVICE` |
 | `/gateway-service/**` | `lb://GATEWAY-SERVICE` (el propio gateway) |
 
 ## Cómo verificar las rutas activas
@@ -102,7 +111,7 @@ curl.exe -s http://localhost:8080/actuator/gateway/routes
 (Invoke-RestMethod http://localhost:8080/actuator/gateway/routes).route_id
 ```
 
-Resultado real: **9 rutas** (4 explícitas + 5 del discovery locator).
+Resultado real: **15 rutas** (7 explícitas + 8 del discovery locator).
 
 ## Qué pasa cuando el destino está caído
 
