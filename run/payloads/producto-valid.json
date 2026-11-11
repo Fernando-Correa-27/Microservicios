@@ -1,0 +1,6 @@
+{
+  "nombre": "Producto Gateway",
+  "precio": 12.50,
+  "stock": 3,
+  "categoriaId": 1
+}

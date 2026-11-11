@@ -1,0 +1,996 @@
+{
+  "info": {
+    "name": "GLAB-S13 — Service Discovery y API Gateway",
+    "description": "Todas las peticiones pasan por el API Gateway (Spring Cloud Gateway 5, WebFlux) en http://localhost:8080. Requiere eureka-server (8761), categoria (8082), producto (8083), cliente (8081) y pedido (8084) levantados y registrados. La carpeta 05 incluye un caso que exige detener producto-service a proposito.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "eurekaUrl", "value": "http://localhost:8761" },
+    { "key": "categoriaId", "value": "1" },
+    { "key": "productoId", "value": "1" },
+    { "key": "clienteId", "value": "6" },
+    { "key": "pedidoId", "value": "1" },
+    { "key": "pedidoAnularId", "value": "2" },
+    { "key": "categoriaUtf8Id", "value": "9" }
+  ],
+  "item": [
+    {
+      "name": "00 — Eureka y rutas del gateway",
+      "item": [
+        {
+          "name": "Eureka: aplicaciones registradas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('GATEWAY-SERVICE registrado', () => pm.expect(pm.response.text()).to.include('GATEWAY-SERVICE'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{eurekaUrl}}/eureka/apps",
+              "host": ["{{eurekaUrl}}"],
+              "path": ["eureka", "apps"]
+            }
+          }
+        },
+        {
+          "name": "Gateway: health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('status UP', () => pm.expect(pm.response.json().status).to.eql('UP'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        },
+        {
+          "name": "Gateway: rutas definidas (actuator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const rutas = pm.response.json();",
+                  "pm.test('incluye las 4 rutas explicitas', () => { const ids = rutas.map(r => r.route_id); ['categoria-service','producto-service','cliente-service','pedido-service'].forEach(id => pm.expect(ids).to.include(id)); });",
+                  "pm.test('el discovery locator agrega una ruta por servicio registrado', () => pm.expect(rutas.length).to.be.at.least(8));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/gateway/routes",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "gateway", "routes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 — Categorias por el gateway",
+      "item": [
+        {
+          "name": "GET lista de categorias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('responde un arreglo', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias"]
+            }
+          }
+        },
+        {
+          "name": "GET categoria por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('tiene nombre', () => pm.expect(pm.response.json()).to.have.property('nombre'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", "1"]
+            }
+          }
+        },
+        {
+          "name": "POST crear categoria (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('devuelve id', () => pm.expect(body).to.have.property('id'));",
+                  "pm.collectionVariables.set('categoriaId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Categoria Gateway\",\n  \"estado\": \"ACTIVO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias"]
+            }
+          }
+        },
+        {
+          "name": "PUT actualizar categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('nombre actualizado', () => pm.expect(pm.response.json().nombre).to.include('Editada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Categoria Gateway Editada\",\n  \"estado\": \"ACTIVO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/{{categoriaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", "{{categoriaId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/{{categoriaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", "{{categoriaId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 — Productos (Feign: categoria anidada)",
+      "item": [
+        {
+          "name": "GET lista de productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('incluye la categoria anidada (Feign)', () => pm.expect(lista[0]).to.have.property('categoria'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        },
+        {
+          "name": "GET producto por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('trae precio', () => pm.expect(pm.response.json()).to.have.property('precio'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "1"]
+            }
+          }
+        },
+        {
+          "name": "POST crear producto (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('devuelve id', () => pm.expect(body).to.have.property('id'));",
+                  "pm.collectionVariables.set('productoId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto Gateway\",\n  \"precio\": 12.50,\n  \"stock\": 3,\n  \"categoriaId\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        },
+        {
+          "name": "PUT actualizar producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('nombre actualizado', () => pm.expect(pm.response.json().nombre).to.include('Editado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto Gateway Editado\",\n  \"precio\": 15.75,\n  \"stock\": 7,\n  \"categoriaId\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/{{productoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "{{productoId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/{{productoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "{{productoId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 — Clientes por el gateway",
+      "item": [
+        {
+          "name": "GET lista de clientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('responde un arreglo', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('trae DNI', () => pm.expect(pm.response.json()).to.have.property('nroDni'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes", "1"]
+            }
+          }
+        },
+        {
+          "name": "POST crear cliente (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('devuelve id', () => pm.expect(body).to.have.property('id'));",
+                  "pm.collectionVariables.set('clienteId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Lucia\",\n  \"apellidos\": \"Quispe Rojas\",\n  \"direccion\": \"Av. Arequipa 123\",\n  \"telefono\": \"987654321\",\n  \"nroDni\": \"71234567\",\n  \"estado\": \"ACTIVO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes"]
+            }
+          }
+        },
+        {
+          "name": "PUT actualizar cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('nombre actualizado', () => pm.expect(pm.response.json().nombre).to.include('Editada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Lucia Editada\",\n  \"apellidos\": \"Quispe Rojas\",\n  \"direccion\": \"Av. Arequipa 123\",\n  \"telefono\": \"987654321\",\n  \"nroDni\": \"71234567\",\n  \"estado\": \"ACTIVO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/{{clienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes", "{{clienteId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/{{clienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes", "{{clienteId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 — Pedidos (Feign: cliente + producto)",
+      "item": [
+        {
+          "name": "GET lista de pedidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('responde un arreglo', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          }
+        },
+        {
+          "name": "GET pedido por id (cliente + producto)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('trae cliente (Feign)', () => pm.expect(body).to.have.property('cliente'));",
+                  "pm.test('trae producto (Feign)', () => pm.expect(body).to.have.property('producto'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", "1"]
+            }
+          }
+        },
+        {
+          "name": "POST crear pedido (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('estado PENDIENTE', () => pm.expect(body.estado).to.eql('PENDIENTE'));",
+                  "pm.collectionVariables.set('pedidoId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": 6,\n  \"productoId\": 9,\n  \"cantidad\": 2\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          }
+        },
+        {
+          "name": "PUT atender pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('estado ATENDIDO', () => pm.expect(pm.response.json().estado).to.eql('ATENDIDO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/{{pedidoId}}/atender",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", "{{pedidoId}}", "atender"]
+            }
+          }
+        },
+        {
+          "name": "POST crear pedido para anular (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('pedidoAnularId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": 7,\n  \"productoId\": 9,\n  \"cantidad\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          }
+        },
+        {
+          "name": "PUT anular pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('estado ANULADO', () => pm.expect(pm.response.json().estado).to.eql('ANULADO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/{{pedidoAnularId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", "{{pedidoAnularId}}", "anular"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 — Errores y resiliencia",
+      "item": [
+        {
+          "name": "POST categoria invalida (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje del servicio intacto', () => pm.expect(pm.response.text()).to.include('El nombre es obligatorio'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"estado\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias"]
+            }
+          }
+        },
+        {
+          "name": "POST producto invalido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje del servicio intacto', () => pm.expect(pm.response.text()).to.include('El precio debe ser mayor a cero'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"precio\": 0,\n  \"stock\": -1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        },
+        {
+          "name": "POST cliente invalido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('errores por campo', () => pm.expect(pm.response.json()).to.have.property('errores'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"apellidos\": \"\",\n  \"direccion\": \"\",\n  \"telefono\": \"123\",\n  \"nroDni\": \"1\",\n  \"estado\": \"X\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes"]
+            }
+          }
+        },
+        {
+          "name": "POST pedido invalido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje del servicio intacto', () => pm.expect(pm.response.text()).to.include('La cantidad debe ser mayor a cero'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": null,\n  \"productoId\": null,\n  \"cantidad\": 0\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          }
+        },
+        {
+          "name": "GET producto inexistente (404 del servicio)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "999999"]
+            }
+          }
+        },
+        {
+          "name": "GET ruta inexistente (404 del gateway)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 Not Found', () => pm.response.to.have.status(404));",
+                  "pm.test('lo genera el gateway', () => pm.expect(pm.response.json()).to.have.property('path'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/inexistente",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inexistente"]
+            }
+          }
+        },
+        {
+          "name": "GET productos con servicio caido (503)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('503 Service Unavailable', () => pm.response.to.have.status(503));",
+                  "pm.test('respuesta controlada del gateway', () => pm.expect(pm.response.json().error).to.include('Service Unavailable'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 — Discovery locator (rutas automaticas)",
+      "item": [
+        {
+          "name": "GET /categoria-service/api/categorias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categoria-service/api/categorias",
+              "host": ["{{baseUrl}}"],
+              "path": ["categoria-service", "api", "categorias"]
+            }
+          }
+        },
+        {
+          "name": "GET /producto-service/api/productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/producto-service/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["producto-service", "api", "productos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 — UTF-8 de punta a punta",
+      "item": [
+        {
+          "name": "POST categoria con tilde (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('conserva la tilde', () => pm.expect(body.nombre).to.eql('Tecnología'));",
+                  "pm.collectionVariables.set('categoriaUtf8Id', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Tecnología\",\n  \"estado\": \"ACTIVO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias"]
+            }
+          }
+        },
+        {
+          "name": "GET categoria UTF-8",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('UTF-8 intacto', () => pm.expect(pm.response.json().nombre).to.eql('Tecnología'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/{{categoriaUtf8Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", "{{categoriaUtf8Id}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE categoria UTF-8",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/{{categoriaUtf8Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", "{{categoriaUtf8Id}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
