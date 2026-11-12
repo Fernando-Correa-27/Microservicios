@@ -5,5 +5,4 @@ target/
 .vscode/
 *.class
 run/logs/
-Lab_Microservicios/.obsidian/
 run/logs/

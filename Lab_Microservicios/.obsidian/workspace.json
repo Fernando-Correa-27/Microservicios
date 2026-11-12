@@ -1,0 +1,212 @@
+{
+  "main": {
+    "id": "2799571d200ff766",
+    "type": "split",
+    "children": [
+      {
+        "id": "5fa16d0194b4aaf4",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a1f1a683033b4406",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "16 Comandos útiles.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "16 Comandos útiles"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "d3720ae98290476b",
+    "type": "split",
+    "children": [
+      {
+        "id": "67316fa3d5b33cdd",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "54f54810998cc0a0",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de archivos"
+            }
+          },
+          {
+            "id": "1be5eb8de43a6e10",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Buscar"
+            }
+          },
+          {
+            "id": "7e55e7b959d61ad6",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "a031d6fc20f20774",
+    "type": "split",
+    "children": [
+      {
+        "id": "ba7ac0922342e3be",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "72f6cae5ec518fb7",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "16 Comandos útiles.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Enlaces entrantes"
+            }
+          },
+          {
+            "id": "4e18d0b64fc737fc",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "16 Comandos útiles.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Enlaces salientes"
+            }
+          },
+          {
+            "id": "a6c9193e5fe3b882",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "8fb4c395af3be8be",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas las propiedades"
+            }
+          },
+          {
+            "id": "b7bf25cea08c70c7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "16 Comandos útiles.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Esquema"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir selector rápido": false,
+      "graph:Abrir vista gráfica": false,
+      "canvas:Crear nuevo lienzo": false,
+      "daily-notes:Abrir la nota de hoy": false,
+      "templates:Insertar plantilla": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Crear nueva base": false
+    }
+  },
+  "active": "a1f1a683033b4406",
+  "lastOpenFiles": [
+    "05 cliente-service.md",
+    "16 Comandos útiles.md",
+    "15 Conclusiones.md",
+    "14 Guía original y problemas detectados.md",
+    "12 Pruebas HTTP.md",
+    "13 Conceptos clave.md",
+    "11 Errores y soluciones.md",
+    "10 Bitácora por pasos.md",
+    "09 cita-service.md",
+    "08 medico-service.md",
+    "07 paciente-service.md",
+    "06 pedido-service.md",
+    "04 producto-service.md",
+    "03 categoria-service.md",
+    "02 Arquitectura de microservicios.md",
+    "01 Entorno y requisitos.md",
+    "Bienvenido.md",
+    "00 Índice (MOC).md"
+  ]
+}
