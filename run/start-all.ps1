@@ -6,7 +6,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
-$javaHome = "C:\Program Files\Microsoft\jdk-25.0.5.21-hotspot"
+$localEnv = Join-Path $PSScriptRoot "local-env.ps1"
+if (Test-Path $localEnv) { . $localEnv }
+$portableJavaHome = Join-Path $root "run\tools\jdk25\jdk-25.0.5.1+2"
+$javaHome = if (Test-Path (Join-Path $portableJavaHome "bin\java.exe")) {
+    $portableJavaHome
+} else {
+    "C:\Program Files\Microsoft\jdk-25.0.5.21-hotspot"
+}
+$portableMaven = Join-Path $root "run\tools\maven\apache-maven-3.9.16\bin\mvn.cmd"
+$mvn = if (Test-Path $portableMaven) { $portableMaven } else { "mvn" }
 $env:JAVA_HOME = $javaHome
 $env:PATH = "$javaHome\bin;$env:PATH"
 
@@ -41,7 +50,7 @@ function Build-Service($name) {
     $project = Join-Path $root $name
     Write-Host "Compilando $name..." -ForegroundColor Cyan
     Push-Location $project
-    mvn -q -DskipTests package
+    & $mvn -q -DskipTests package
     $code = $LASTEXITCODE
     Pop-Location
     if ($code -ne 0) { throw "Fallo la compilacion de $name" }
